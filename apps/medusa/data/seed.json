@@ -1,0 +1,477 @@
+{
+  "store": {
+    "name": "Draven Store",
+    "swap_link_template": "",
+    "payment_link_template": "",
+    "invite_link_template": "",
+    "default_currency_code": "idr",
+    "currencies": ["idr"]
+  },
+  "regions": [
+    {
+      "id": "reg_indonesia",
+      "name": "Indonesia",
+      "currency_code": "idr",
+      "tax_rate": 11,
+      "payment_providers": ["manual"],
+      "fulfillment_providers": ["manual"],
+      "countries": ["id"]
+    }
+  ],
+  "shipping_options": [
+    {
+      "name": "JNE Reguler (REG)",
+      "region_id": "reg_indonesia",
+      "provider_id": "manual",
+      "data": { "courier": "jne", "service": "REG" },
+      "price_type": "flat_rate",
+      "amount": 15000
+    },
+    {
+      "name": "JNE Ekonomi (OKE)",
+      "region_id": "reg_indonesia",
+      "provider_id": "manual",
+      "data": { "courier": "jne", "service": "OKE" },
+      "price_type": "flat_rate",
+      "amount": 10000
+    },
+    {
+      "name": "J&T Express",
+      "region_id": "reg_indonesia",
+      "provider_id": "manual",
+      "data": { "courier": "jnt", "service": "EZ" },
+      "price_type": "flat_rate",
+      "amount": 12000
+    },
+    {
+      "name": "SiCepat REG",
+      "region_id": "reg_indonesia",
+      "provider_id": "manual",
+      "data": { "courier": "sicepat", "service": "REG" },
+      "price_type": "flat_rate",
+      "amount": 13000
+    }
+  ],
+  "products": [
+    {
+      "title": "Kaos Polos Premium",
+      "subtitle": "Bahan cotton combed 30s, nyaman dipakai sehari-hari",
+      "description": "Kaos polos premium dengan bahan cotton combed 30s yang lembut dan adem. Cocok untuk aktivitas sehari-hari maupun dipadukan dengan outfit kasual.",
+      "handle": "kaos-polos-premium",
+      "is_giftcard": false,
+      "weight": 200,
+      "images": [],
+      "options": [
+        { "title": "Ukuran" },
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "S / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 89000 }],
+          "options": [{ "value": "S" }, { "value": "Hitam" }],
+          "inventory_quantity": 50,
+          "manage_inventory": true
+        },
+        {
+          "title": "M / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 89000 }],
+          "options": [{ "value": "M" }, { "value": "Hitam" }],
+          "inventory_quantity": 50,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 89000 }],
+          "options": [{ "value": "L" }, { "value": "Hitam" }],
+          "inventory_quantity": 50,
+          "manage_inventory": true
+        },
+        {
+          "title": "XL / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 89000 }],
+          "options": [{ "value": "XL" }, { "value": "Hitam" }],
+          "inventory_quantity": 30,
+          "manage_inventory": true
+        },
+        {
+          "title": "M / Putih",
+          "prices": [{ "currency_code": "idr", "amount": 89000 }],
+          "options": [{ "value": "M" }, { "value": "Putih" }],
+          "inventory_quantity": 40,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Putih",
+          "prices": [{ "currency_code": "idr", "amount": 89000 }],
+          "options": [{ "value": "L" }, { "value": "Putih" }],
+          "inventory_quantity": 40,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Hoodie Basic Unisex",
+      "subtitle": "Hoodie fleece tebal, hangat untuk musim hujan",
+      "description": "Hoodie basic unisex dengan bahan fleece tebal. Dilengkapi kantong depan dan tali hoodie. Cocok untuk cuaca dingin dan aktivitas outdoor.",
+      "handle": "hoodie-basic-unisex",
+      "is_giftcard": false,
+      "weight": 450,
+      "images": [],
+      "options": [
+        { "title": "Ukuran" },
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "M / Abu-abu",
+          "prices": [{ "currency_code": "idr", "amount": 189000 }],
+          "options": [{ "value": "M" }, { "value": "Abu-abu" }],
+          "inventory_quantity": 30,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Abu-abu",
+          "prices": [{ "currency_code": "idr", "amount": 189000 }],
+          "options": [{ "value": "L" }, { "value": "Abu-abu" }],
+          "inventory_quantity": 30,
+          "manage_inventory": true
+        },
+        {
+          "title": "XL / Abu-abu",
+          "prices": [{ "currency_code": "idr", "amount": 189000 }],
+          "options": [{ "value": "XL" }, { "value": "Abu-abu" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        },
+        {
+          "title": "M / Navy",
+          "prices": [{ "currency_code": "idr", "amount": 189000 }],
+          "options": [{ "value": "M" }, { "value": "Navy" }],
+          "inventory_quantity": 25,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Navy",
+          "prices": [{ "currency_code": "idr", "amount": 189000 }],
+          "options": [{ "value": "L" }, { "value": "Navy" }],
+          "inventory_quantity": 25,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Celana Chino Slim Fit",
+      "subtitle": "Celana chino stretch, nyaman untuk kerja dan santai",
+      "description": "Celana chino slim fit dengan bahan stretch yang elastis dan nyaman. Cocok dipakai untuk kerja maupun hangout. Tersedia dalam berbagai warna.",
+      "handle": "celana-chino-slim-fit",
+      "is_giftcard": false,
+      "weight": 350,
+      "images": [],
+      "options": [
+        { "title": "Ukuran" },
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "30 / Khaki",
+          "prices": [{ "currency_code": "idr", "amount": 249000 }],
+          "options": [{ "value": "30" }, { "value": "Khaki" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        },
+        {
+          "title": "32 / Khaki",
+          "prices": [{ "currency_code": "idr", "amount": 249000 }],
+          "options": [{ "value": "32" }, { "value": "Khaki" }],
+          "inventory_quantity": 25,
+          "manage_inventory": true
+        },
+        {
+          "title": "34 / Khaki",
+          "prices": [{ "currency_code": "idr", "amount": 249000 }],
+          "options": [{ "value": "34" }, { "value": "Khaki" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        },
+        {
+          "title": "32 / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 249000 }],
+          "options": [{ "value": "32" }, { "value": "Hitam" }],
+          "inventory_quantity": 25,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Tote Bag Kanvas",
+      "subtitle": "Tas kanvas tebal, ramah lingkungan",
+      "description": "Tote bag kanvas tebal premium. Kuat, tahan lama, dan ramah lingkungan. Cocok untuk belanja, kampus, atau aktivitas sehari-hari.",
+      "handle": "tote-bag-kanvas",
+      "is_giftcard": false,
+      "weight": 300,
+      "images": [],
+      "options": [
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "Natural",
+          "prices": [{ "currency_code": "idr", "amount": 75000 }],
+          "options": [{ "value": "Natural" }],
+          "inventory_quantity": 100,
+          "manage_inventory": true
+        },
+        {
+          "title": "Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 75000 }],
+          "options": [{ "value": "Hitam" }],
+          "inventory_quantity": 80,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Kemeja Flannel Kotak",
+      "subtitle": "Kemeja flannel premium, bisa dipakai casual atau layering",
+      "description": "Kemeja flannel motif kotak-kotak dengan bahan tebal dan lembut. Bisa dipakai sebagai outer atau kemeja biasa. Gaya streetwear yang timeless.",
+      "handle": "kemeja-flannel-kotak",
+      "is_giftcard": false,
+      "weight": 350,
+      "images": [],
+      "options": [
+        { "title": "Ukuran" },
+        { "title": "Motif" }
+      ],
+      "variants": [
+        {
+          "title": "M / Merah-Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 169000 }],
+          "options": [{ "value": "M" }, { "value": "Merah-Hitam" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Merah-Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 169000 }],
+          "options": [{ "value": "L" }, { "value": "Merah-Hitam" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        },
+        {
+          "title": "XL / Merah-Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 169000 }],
+          "options": [{ "value": "XL" }, { "value": "Merah-Hitam" }],
+          "inventory_quantity": 15,
+          "manage_inventory": true
+        },
+        {
+          "title": "M / Biru-Putih",
+          "prices": [{ "currency_code": "idr", "amount": 169000 }],
+          "options": [{ "value": "M" }, { "value": "Biru-Putih" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Biru-Putih",
+          "prices": [{ "currency_code": "idr", "amount": 169000 }],
+          "options": [{ "value": "L" }, { "value": "Biru-Putih" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Topi Baseball Cap",
+      "subtitle": "Topi baseball unisex, adjustable strap",
+      "description": "Topi baseball cap dengan bahan twill cotton. Ukuran adjustable dengan strap belakang. Cocok untuk outdoor dan daily wear.",
+      "handle": "topi-baseball-cap",
+      "is_giftcard": false,
+      "weight": 100,
+      "images": [],
+      "options": [
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 59000 }],
+          "options": [{ "value": "Hitam" }],
+          "inventory_quantity": 60,
+          "manage_inventory": true
+        },
+        {
+          "title": "Navy",
+          "prices": [{ "currency_code": "idr", "amount": 59000 }],
+          "options": [{ "value": "Navy" }],
+          "inventory_quantity": 40,
+          "manage_inventory": true
+        },
+        {
+          "title": "Putih",
+          "prices": [{ "currency_code": "idr", "amount": 59000 }],
+          "options": [{ "value": "Putih" }],
+          "inventory_quantity": 30,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Kaus Kaki Set (3 Pasang)",
+      "subtitle": "Kaus kaki ankle cut, bahan cotton premium",
+      "description": "Set 3 pasang kaus kaki ankle cut dari bahan cotton blend. Anti-bakteri dan menyerap keringat. Cocok untuk olahraga dan daily use.",
+      "handle": "kaus-kaki-set-3-pasang",
+      "is_giftcard": false,
+      "weight": 120,
+      "images": [],
+      "options": [
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "Hitam (3pcs)",
+          "prices": [{ "currency_code": "idr", "amount": 45000 }],
+          "options": [{ "value": "Hitam (3pcs)" }],
+          "inventory_quantity": 100,
+          "manage_inventory": true
+        },
+        {
+          "title": "Putih (3pcs)",
+          "prices": [{ "currency_code": "idr", "amount": 45000 }],
+          "options": [{ "value": "Putih (3pcs)" }],
+          "inventory_quantity": 80,
+          "manage_inventory": true
+        },
+        {
+          "title": "Mix (3pcs)",
+          "prices": [{ "currency_code": "idr", "amount": 45000 }],
+          "options": [{ "value": "Mix (3pcs)" }],
+          "inventory_quantity": 60,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Jaket Bomber Polos",
+      "subtitle": "Jaket bomber waterproof ringan",
+      "description": "Jaket bomber dengan bahan taslan waterproof. Ringan, tahan air, dan stylish. Cocok untuk riding atau aktivitas outdoor saat musim hujan.",
+      "handle": "jaket-bomber-polos",
+      "is_giftcard": false,
+      "weight": 400,
+      "images": [],
+      "options": [
+        { "title": "Ukuran" },
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "M / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 279000 }],
+          "options": [{ "value": "M" }, { "value": "Hitam" }],
+          "inventory_quantity": 15,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 279000 }],
+          "options": [{ "value": "L" }, { "value": "Hitam" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        },
+        {
+          "title": "XL / Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 279000 }],
+          "options": [{ "value": "XL" }, { "value": "Hitam" }],
+          "inventory_quantity": 15,
+          "manage_inventory": true
+        },
+        {
+          "title": "L / Army Green",
+          "prices": [{ "currency_code": "idr", "amount": 279000 }],
+          "options": [{ "value": "L" }, { "value": "Army Green" }],
+          "inventory_quantity": 15,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Sabuk Kulit Sintetis",
+      "subtitle": "Sabuk kulit PU, buckle metal",
+      "description": "Sabuk kulit sintetis (PU leather) dengan buckle metal silver. Tampilan formal dan premium. Panjang bisa disesuaikan.",
+      "handle": "sabuk-kulit-sintetis",
+      "is_giftcard": false,
+      "weight": 150,
+      "images": [],
+      "options": [
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 85000 }],
+          "options": [{ "value": "Hitam" }],
+          "inventory_quantity": 40,
+          "manage_inventory": true
+        },
+        {
+          "title": "Coklat",
+          "prices": [{ "currency_code": "idr", "amount": 85000 }],
+          "options": [{ "value": "Coklat" }],
+          "inventory_quantity": 35,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    },
+    {
+      "title": "Dompet Bifold Minimalis",
+      "subtitle": "Dompet lipat slim, bahan kulit sintetis premium",
+      "description": "Dompet bifold minimalis dengan desain slim. 6 slot kartu, 1 slot uang, 1 slot koin. Bahan kulit sintetis premium anti gores.",
+      "handle": "dompet-bifold-minimalis",
+      "is_giftcard": false,
+      "weight": 100,
+      "images": [],
+      "options": [
+        { "title": "Warna" }
+      ],
+      "variants": [
+        {
+          "title": "Hitam",
+          "prices": [{ "currency_code": "idr", "amount": 125000 }],
+          "options": [{ "value": "Hitam" }],
+          "inventory_quantity": 30,
+          "manage_inventory": true
+        },
+        {
+          "title": "Coklat Tua",
+          "prices": [{ "currency_code": "idr", "amount": 125000 }],
+          "options": [{ "value": "Coklat Tua" }],
+          "inventory_quantity": 25,
+          "manage_inventory": true
+        },
+        {
+          "title": "Navy",
+          "prices": [{ "currency_code": "idr", "amount": 125000 }],
+          "options": [{ "value": "Navy" }],
+          "inventory_quantity": 20,
+          "manage_inventory": true
+        }
+      ],
+      "collection_id": null
+    }
+  ],
+  "users": [
+    {
+      "email": "admin@draven.store",
+      "password": "supersecret"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white text-brand-900 antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    @apply bg-brand-900 text-white;
+  }
+}
+
+@layer components {
+  /* Primary — solid black, square edges */
+  .btn-primary {
+    @apply inline-flex items-center justify-center bg-brand-900 px-8 py-3.5 text-[13px] font-semibold uppercase tracking-wider text-white transition-colors hover:bg-brand-700 active:bg-brand-950 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  /* Secondary — outlined */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center border border-brand-900 px-8 py-3.5 text-[13px] font-semibold uppercase tracking-wider text-brand-900 transition-colors hover:bg-brand-900 hover:text-white;
+  }
+
+  /* Ghost */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-brand-500 transition-colors hover:text-brand-900;
+  }
+
+  /* Form inputs */
+  .input-field {
+    @apply w-full border border-brand-200 bg-white px-4 py-3 text-sm text-brand-900 placeholder:text-brand-400 transition-all focus:border-brand-900 focus:outline-none focus:ring-1 focus:ring-brand-900;
+  }
+
+  /* Section heading */
+  .section-title {
+    @apply text-2xl font-bold uppercase tracking-wide text-brand-900 md:text-3xl;
+  }
+}
+
+@layer utilities {
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}

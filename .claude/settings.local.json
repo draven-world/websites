@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --version)",
+      "Bash(npm install:*)",
+      "Bash(pnpm --version)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm ls:*)",
+      "Bash(npx next:*)",
+      "Bash(cd:*)",
+      "WebFetch(domain:calledelarache.com)",
+      "Bash(rm -rf apps/storefront/.next)",
+      "Bash(pnpm --filter @draven/storefront build)",
+      "Bash(pnpm --filter @draven/medusa add -D @babel/cli @babel/core @babel/preset-typescript)",
+      "Bash(pnpm --filter @draven/medusa add @medusajs/event-bus-local)",
+      "Bash(pnpm --filter @draven/medusa list @medusajs/event-bus-local @medusajs/medusa @medusajs/event-bus-redis @medusajs/cache-redis)",
+      "Bash(pnpm --filter @draven/medusa remove @medusajs/event-bus-local)",
+      "Bash(pnpm --filter @draven/medusa add @medusajs/event-bus-local@^1.9.0)",
+      "Bash(pnpm --filter @draven/medusa list @medusajs/medusa-cli medusa-cli)",
+      "Bash(medusa --version)",
+      "Bash(npm list:*)",
+      "Bash(pnpm --filter @draven/medusa add -D @medusajs/medusa-cli@1.3.22)",
+      "Bash(pnpm --filter @draven/medusa add @medusajs/admin@^7.1.0)",
+      "Bash(mkdir -p \"D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app\\\\api\\\\payment\\\\create\")",
+      "Bash(mkdir -p \"D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app\\\\api\\\\payment\\\\notification\")",
+      "Bash(mkdir -p \"D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app\\\\api\\\\shipping\\\\provinces\")",
+      "Bash(mkdir -p \"D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app\\\\api\\\\shipping\\\\cities\")",
+      "Bash(mkdir -p \"D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app\\\\api\\\\shipping\\\\cost\")",
+      "Bash(ls:*)",
+      "Bash(npx tsc:*)"
+    ]
+  }
+}

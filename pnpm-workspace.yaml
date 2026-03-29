@@ -1,0 +1,11 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'packages/config/*'
+  - 'studio'
+allowBuilds:
+  core-js: false
+  esbuild: false
+  medusa-telemetry: false
+  msgpackr-extract: false
+  unrs-resolver: false

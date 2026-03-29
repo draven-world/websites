@@ -1,0 +1,35 @@
+{
+  "name": "@draven/storefront",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "dev:tunnel": "next dev --hostname 0.0.0.0",
+    "build": "next build",
+    "start": "next start",
+    "preview": "next build && next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@draven/ui": "workspace:*",
+    "@medusajs/medusa-js": "^6.0.0",
+    "@sanity/client": "^6.0.0",
+    "@sanity/image-url": "^1.0.0",
+    "next": "^14.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@draven/eslint-config": "workspace:*",
+    "@draven/tsconfig": "workspace:*",
+    "@draven/tailwind-config": "workspace:*",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0"
+  }
+}
