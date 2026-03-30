@@ -31,67 +31,75 @@ export type ShippingCost = {
 type CheckoutStep = 'shipping' | 'delivery' | 'payment'
 
 export default function CheckoutPage() {
-  const { cart, totalItems } = useCart()
+  const { cart, totalItems, loading } = useCart()
   const [step, setStep] = useState<CheckoutStep>('shipping')
   const [address, setAddress] = useState<ShippingAddress | null>(null)
   const [shippingCost, setShippingCost] = useState<ShippingCost | null>(null)
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
+      </div>
+    )
+  }
+
   if (totalItems === 0) {
     return (
-      <div className="mx-auto max-w-[1400px] px-5 py-24 text-center lg:px-8">
-        <h1 className="text-xl font-bold uppercase tracking-wide text-brand-900">
-          Keranjang Kosong
+      <div className="mx-auto max-w-container px-5 py-32 text-center lg:px-8">
+        <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
+          Your bag is empty
         </h1>
-        <p className="mt-2 text-sm text-brand-400">
-          Tambahkan produk ke keranjang sebelum checkout
+        <p className="mt-3 text-sm text-brand-400">
+          Add something before checking out.
         </p>
         <Link href="/products" className="btn-primary mt-8 inline-flex">
-          BELANJA SEKARANG
+          Shop Now
         </Link>
       </div>
     )
   }
 
-  return (
-    <div className="mx-auto max-w-[1400px] px-5 py-8 lg:px-8 lg:py-12">
-      <h1 className="mb-8 text-2xl font-bold text-brand-900">Checkout</h1>
+  const stepLabels = ['Address', 'Shipping', 'Payment'] as const
+  const steps = ['shipping', 'delivery', 'payment'] as const
 
-      {/* Progress Steps */}
-      <div className="mb-10 flex items-center gap-3 text-xs">
-        {(['shipping', 'delivery', 'payment'] as const).map((s, i) => {
-          const labels = ['ALAMAT', 'PENGIRIMAN', 'PEMBAYARAN']
+  return (
+    <div className="mx-auto max-w-container px-5 py-10 lg:px-8 lg:py-16">
+      <h1 className="text-2xl font-medium tracking-tightest text-brand-950 md:text-3xl">
+        Checkout
+      </h1>
+
+      {/* Progress */}
+      <div className="mt-8 flex items-center gap-4 text-[11px] uppercase tracking-widest">
+        {steps.map((s, i) => {
           const isActive = s === step
           const isDone =
             (s === 'shipping' && (step === 'delivery' || step === 'payment')) ||
             (s === 'delivery' && step === 'payment')
 
           return (
-            <div key={s} className="flex items-center gap-3">
-              {i > 0 && <div className="h-px w-8 bg-brand-200" />}
+            <div key={s} className="flex items-center gap-4">
+              {i > 0 && <div className="h-px w-6 bg-brand-200" />}
               <span
-                className={`flex h-7 w-7 items-center justify-center text-[11px] font-bold ${
+                className={`flex h-6 w-6 items-center justify-center text-[10px] ${
                   isDone
-                    ? 'bg-brand-900 text-white'
+                    ? 'bg-brand-950 text-white'
                     : isActive
-                      ? 'border-2 border-brand-900 text-brand-900'
-                      : 'border border-brand-200 text-brand-400'
+                      ? 'border border-brand-950 text-brand-950'
+                      : 'border border-brand-200 text-brand-300'
                 }`}
               >
-                {isDone ? '\u2713' : i + 1}
+                {isDone ? '✓' : i + 1}
               </span>
-              <span
-                className={`font-semibold uppercase tracking-wider ${
-                  isActive || isDone ? 'text-brand-900' : 'text-brand-300'
-                }`}
-              >
-                {labels[i]}
+              <span className={isDone || isActive ? 'text-brand-950' : 'text-brand-300'}>
+                {stepLabels[i]}
               </span>
             </div>
           )
         })}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="mt-10 grid gap-10 lg:grid-cols-3">
         <div className="lg:col-span-2">
           {step === 'shipping' && (
             <ShippingForm
@@ -105,8 +113,8 @@ export default function CheckoutPage() {
           {step === 'delivery' && address && (
             <ShippingOptions
               address={address}
-              cartWeight={cart?.items?.reduce(
-                (sum: number, item: any) => sum + (item.variant?.product?.weight || 200) * item.quantity,
+              cartWeight={cart.items.reduce(
+                (sum, item) => sum + 200 * item.quantity,
                 0,
               ) || 1000}
               onSelect={(cost) => {
@@ -117,7 +125,7 @@ export default function CheckoutPage() {
             />
           )}
 
-          {step === 'payment' && address && shippingCost && cart && (
+          {step === 'payment' && address && shippingCost && (
             <PaymentSection
               cart={cart}
               address={address}

@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "sanity dev",
     "build": "sanity build",
-    "deploy": "sanity deploy"
+    "deploy": "sanity deploy",
+    "seed": "tsx seed.ts"
   },
   "dependencies": {
     "@sanity/vision": "^3.0.0",
@@ -15,7 +16,10 @@
     "styled-components": "^6.0.0"
   },
   "devDependencies": {
+    "@sanity/client": "^6.29.1",
+    "@types/node": "^20.19.37",
     "@types/react": "^18.2.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.0"
   }
 }

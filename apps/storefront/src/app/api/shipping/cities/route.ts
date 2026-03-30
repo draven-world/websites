@@ -1,17 +1,172 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCities } from '@/lib/rajaongkir'
 
+const FALLBACK_CITIES: Record<string, Array<{ city_id: string; city_name: string; type: string; postal_code: string }>> = {
+  '1': [ // Bali
+    { city_id: '17', city_name: 'Badung', type: 'Kabupaten', postal_code: '80351' },
+    { city_id: '32', city_name: 'Bangli', type: 'Kabupaten', postal_code: '80619' },
+    { city_id: '94', city_name: 'Buleleng', type: 'Kabupaten', postal_code: '81111' },
+    { city_id: '114', city_name: 'Denpasar', type: 'Kota', postal_code: '80227' },
+    { city_id: '145', city_name: 'Gianyar', type: 'Kabupaten', postal_code: '80519' },
+    { city_id: '175', city_name: 'Jembrana', type: 'Kabupaten', postal_code: '82218' },
+    { city_id: '197', city_name: 'Karangasem', type: 'Kabupaten', postal_code: '80819' },
+    { city_id: '215', city_name: 'Klungkung', type: 'Kabupaten', postal_code: '80719' },
+    { city_id: '471', city_name: 'Tabanan', type: 'Kabupaten', postal_code: '82119' },
+  ],
+  '3': [ // Banten
+    { city_id: '106', city_name: 'Cilegon', type: 'Kota', postal_code: '42417' },
+    { city_id: '232', city_name: 'Lebak', type: 'Kabupaten', postal_code: '42319' },
+    { city_id: '331', city_name: 'Pandeglang', type: 'Kabupaten', postal_code: '42212' },
+    { city_id: '402', city_name: 'Serang', type: 'Kabupaten', postal_code: '42182' },
+    { city_id: '403', city_name: 'Serang', type: 'Kota', postal_code: '42111' },
+    { city_id: '455', city_name: 'Tangerang', type: 'Kabupaten', postal_code: '15914' },
+    { city_id: '456', city_name: 'Tangerang', type: 'Kota', postal_code: '15111' },
+    { city_id: '457', city_name: 'Tangerang Selatan', type: 'Kota', postal_code: '15332' },
+  ],
+  '5': [ // DI Yogyakarta
+    { city_id: '39', city_name: 'Bantul', type: 'Kabupaten', postal_code: '55715' },
+    { city_id: '135', city_name: 'Gunung Kidul', type: 'Kabupaten', postal_code: '55812' },
+    { city_id: '210', city_name: 'Kulon Progo', type: 'Kabupaten', postal_code: '55611' },
+    { city_id: '419', city_name: 'Sleman', type: 'Kabupaten', postal_code: '55513' },
+    { city_id: '501', city_name: 'Yogyakarta', type: 'Kota', postal_code: '55222' },
+  ],
+  '6': [ // DKI Jakarta
+    { city_id: '151', city_name: 'Jakarta Barat', type: 'Kota', postal_code: '11220' },
+    { city_id: '152', city_name: 'Jakarta Pusat', type: 'Kota', postal_code: '10540' },
+    { city_id: '153', city_name: 'Jakarta Selatan', type: 'Kota', postal_code: '12230' },
+    { city_id: '154', city_name: 'Jakarta Timur', type: 'Kota', postal_code: '13330' },
+    { city_id: '155', city_name: 'Jakarta Utara', type: 'Kota', postal_code: '14140' },
+    { city_id: '189', city_name: 'Kepulauan Seribu', type: 'Kabupaten', postal_code: '14550' },
+  ],
+  '9': [ // Jawa Barat
+    { city_id: '22', city_name: 'Bandung', type: 'Kabupaten', postal_code: '40311' },
+    { city_id: '23', city_name: 'Bandung', type: 'Kota', postal_code: '40111' },
+    { city_id: '24', city_name: 'Bandung Barat', type: 'Kabupaten', postal_code: '40721' },
+    { city_id: '34', city_name: 'Banjar', type: 'Kota', postal_code: '46311' },
+    { city_id: '54', city_name: 'Bekasi', type: 'Kabupaten', postal_code: '17837' },
+    { city_id: '55', city_name: 'Bekasi', type: 'Kota', postal_code: '17121' },
+    { city_id: '78', city_name: 'Bogor', type: 'Kabupaten', postal_code: '16911' },
+    { city_id: '79', city_name: 'Bogor', type: 'Kota', postal_code: '16119' },
+    { city_id: '103', city_name: 'Ciamis', type: 'Kabupaten', postal_code: '46211' },
+    { city_id: '104', city_name: 'Cianjur', type: 'Kabupaten', postal_code: '43217' },
+    { city_id: '107', city_name: 'Cimahi', type: 'Kota', postal_code: '40512' },
+    { city_id: '108', city_name: 'Cirebon', type: 'Kabupaten', postal_code: '45611' },
+    { city_id: '109', city_name: 'Cirebon', type: 'Kota', postal_code: '45116' },
+    { city_id: '115', city_name: 'Depok', type: 'Kota', postal_code: '16416' },
+    { city_id: '126', city_name: 'Garut', type: 'Kabupaten', postal_code: '44126' },
+    { city_id: '149', city_name: 'Indramayu', type: 'Kabupaten', postal_code: '45214' },
+    { city_id: '198', city_name: 'Karawang', type: 'Kabupaten', postal_code: '41311' },
+    { city_id: '211', city_name: 'Kuningan', type: 'Kabupaten', postal_code: '45511' },
+    { city_id: '252', city_name: 'Majalengka', type: 'Kabupaten', postal_code: '45411' },
+    { city_id: '332', city_name: 'Pangandaran', type: 'Kabupaten', postal_code: '46511' },
+    { city_id: '376', city_name: 'Purwakarta', type: 'Kabupaten', postal_code: '41119' },
+    { city_id: '428', city_name: 'Subang', type: 'Kabupaten', postal_code: '41215' },
+    { city_id: '430', city_name: 'Sukabumi', type: 'Kabupaten', postal_code: '43311' },
+    { city_id: '431', city_name: 'Sukabumi', type: 'Kota', postal_code: '43114' },
+    { city_id: '440', city_name: 'Sumedang', type: 'Kabupaten', postal_code: '45326' },
+    { city_id: '468', city_name: 'Tasikmalaya', type: 'Kabupaten', postal_code: '46411' },
+    { city_id: '469', city_name: 'Tasikmalaya', type: 'Kota', postal_code: '46116' },
+  ],
+  '10': [ // Jawa Tengah
+    { city_id: '33', city_name: 'Banjarnegara', type: 'Kabupaten', postal_code: '53419' },
+    { city_id: '41', city_name: 'Banyumas', type: 'Kabupaten', postal_code: '53114' },
+    { city_id: '45', city_name: 'Batang', type: 'Kabupaten', postal_code: '51211' },
+    { city_id: '75', city_name: 'Blora', type: 'Kabupaten', postal_code: '58219' },
+    { city_id: '80', city_name: 'Boyolali', type: 'Kabupaten', postal_code: '57312' },
+    { city_id: '91', city_name: 'Brebes', type: 'Kabupaten', postal_code: '52212' },
+    { city_id: '105', city_name: 'Cilacap', type: 'Kabupaten', postal_code: '53211' },
+    { city_id: '113', city_name: 'Demak', type: 'Kabupaten', postal_code: '59519' },
+    { city_id: '134', city_name: 'Grobogan', type: 'Kabupaten', postal_code: '58111' },
+    { city_id: '163', city_name: 'Jepara', type: 'Kabupaten', postal_code: '59419' },
+    { city_id: '196', city_name: 'Karanganyar', type: 'Kabupaten', postal_code: '57718' },
+    { city_id: '202', city_name: 'Kebumen', type: 'Kabupaten', postal_code: '54319' },
+    { city_id: '204', city_name: 'Kendal', type: 'Kabupaten', postal_code: '51314' },
+    { city_id: '218', city_name: 'Klaten', type: 'Kabupaten', postal_code: '57411' },
+    { city_id: '224', city_name: 'Kudus', type: 'Kabupaten', postal_code: '59311' },
+    { city_id: '249', city_name: 'Magelang', type: 'Kabupaten', postal_code: '56519' },
+    { city_id: '250', city_name: 'Magelang', type: 'Kota', postal_code: '56133' },
+    { city_id: '344', city_name: 'Pati', type: 'Kabupaten', postal_code: '59114' },
+    { city_id: '348', city_name: 'Pekalongan', type: 'Kabupaten', postal_code: '51161' },
+    { city_id: '349', city_name: 'Pekalongan', type: 'Kota', postal_code: '51122' },
+    { city_id: '352', city_name: 'Pemalang', type: 'Kabupaten', postal_code: '52319' },
+    { city_id: '375', city_name: 'Purbalingga', type: 'Kabupaten', postal_code: '53312' },
+    { city_id: '377', city_name: 'Purworejo', type: 'Kabupaten', postal_code: '54111' },
+    { city_id: '380', city_name: 'Rembang', type: 'Kabupaten', postal_code: '59219' },
+    { city_id: '386', city_name: 'Salatiga', type: 'Kota', postal_code: '50711' },
+    { city_id: '398', city_name: 'Semarang', type: 'Kabupaten', postal_code: '50511' },
+    { city_id: '399', city_name: 'Semarang', type: 'Kota', postal_code: '50135' },
+    { city_id: '427', city_name: 'Sragen', type: 'Kabupaten', postal_code: '57211' },
+    { city_id: '433', city_name: 'Sukoharjo', type: 'Kabupaten', postal_code: '57514' },
+    { city_id: '445', city_name: 'Surakarta (Solo)', type: 'Kota', postal_code: '57113' },
+    { city_id: '472', city_name: 'Tegal', type: 'Kabupaten', postal_code: '52419' },
+    { city_id: '473', city_name: 'Tegal', type: 'Kota', postal_code: '52114' },
+    { city_id: '476', city_name: 'Temanggung', type: 'Kabupaten', postal_code: '56212' },
+    { city_id: '497', city_name: 'Wonogiri', type: 'Kabupaten', postal_code: '57619' },
+    { city_id: '498', city_name: 'Wonosobo', type: 'Kabupaten', postal_code: '56311' },
+  ],
+  '11': [ // Jawa Timur
+    { city_id: '31', city_name: 'Bangkalan', type: 'Kabupaten', postal_code: '69118' },
+    { city_id: '42', city_name: 'Banyuwangi', type: 'Kabupaten', postal_code: '68416' },
+    { city_id: '46', city_name: 'Batu', type: 'Kota', postal_code: '65311' },
+    { city_id: '74', city_name: 'Blitar', type: 'Kabupaten', postal_code: '66171' },
+    { city_id: '76', city_name: 'Bojonegoro', type: 'Kabupaten', postal_code: '62119' },
+    { city_id: '90', city_name: 'Bondowoso', type: 'Kabupaten', postal_code: '68219' },
+    { city_id: '133', city_name: 'Gresik', type: 'Kabupaten', postal_code: '61115' },
+    { city_id: '160', city_name: 'Jember', type: 'Kabupaten', postal_code: '68113' },
+    { city_id: '164', city_name: 'Jombang', type: 'Kabupaten', postal_code: '61415' },
+    { city_id: '203', city_name: 'Kediri', type: 'Kabupaten', postal_code: '64184' },
+    { city_id: '222', city_name: 'Lamongan', type: 'Kabupaten', postal_code: '62219' },
+    { city_id: '243', city_name: 'Lumajang', type: 'Kabupaten', postal_code: '67319' },
+    { city_id: '247', city_name: 'Madiun', type: 'Kabupaten', postal_code: '63153' },
+    { city_id: '248', city_name: 'Madiun', type: 'Kota', postal_code: '63122' },
+    { city_id: '251', city_name: 'Magetan', type: 'Kabupaten', postal_code: '63314' },
+    { city_id: '256', city_name: 'Malang', type: 'Kabupaten', postal_code: '65163' },
+    { city_id: '255', city_name: 'Malang', type: 'Kota', postal_code: '65112' },
+    { city_id: '289', city_name: 'Mojokerto', type: 'Kabupaten', postal_code: '61382' },
+    { city_id: '290', city_name: 'Mojokerto', type: 'Kota', postal_code: '61316' },
+    { city_id: '305', city_name: 'Nganjuk', type: 'Kabupaten', postal_code: '64414' },
+    { city_id: '306', city_name: 'Ngawi', type: 'Kabupaten', postal_code: '63219' },
+    { city_id: '318', city_name: 'Pacitan', type: 'Kabupaten', postal_code: '63512' },
+    { city_id: '330', city_name: 'Pamekasan', type: 'Kabupaten', postal_code: '69319' },
+    { city_id: '342', city_name: 'Pasuruan', type: 'Kabupaten', postal_code: '67153' },
+    { city_id: '343', city_name: 'Pasuruan', type: 'Kota', postal_code: '67118' },
+    { city_id: '363', city_name: 'Ponorogo', type: 'Kabupaten', postal_code: '63411' },
+    { city_id: '369', city_name: 'Probolinggo', type: 'Kabupaten', postal_code: '67282' },
+    { city_id: '370', city_name: 'Probolinggo', type: 'Kota', postal_code: '67215' },
+    { city_id: '390', city_name: 'Sampang', type: 'Kabupaten', postal_code: '69219' },
+    { city_id: '409', city_name: 'Sidoarjo', type: 'Kabupaten', postal_code: '61219' },
+    { city_id: '418', city_name: 'Situbondo', type: 'Kabupaten', postal_code: '68316' },
+    { city_id: '441', city_name: 'Sumenep', type: 'Kabupaten', postal_code: '69413' },
+    { city_id: '444', city_name: 'Surabaya', type: 'Kota', postal_code: '60119' },
+    { city_id: '487', city_name: 'Trenggalek', type: 'Kabupaten', postal_code: '66312' },
+    { city_id: '489', city_name: 'Tuban', type: 'Kabupaten', postal_code: '62319' },
+    { city_id: '492', city_name: 'Tulungagung', type: 'Kabupaten', postal_code: '66212' },
+  ],
+  '34': [ // Sumatera Utara
+    { city_id: '278', city_name: 'Medan', type: 'Kota', postal_code: '20228' },
+    { city_id: '110', city_name: 'Deli Serdang', type: 'Kabupaten', postal_code: '20511' },
+    { city_id: '70', city_name: 'Binjai', type: 'Kota', postal_code: '20712' },
+    { city_id: '462', city_name: 'Tebing Tinggi', type: 'Kota', postal_code: '20632' },
+    { city_id: '404', city_name: 'Serdang Bedagai', type: 'Kabupaten', postal_code: '20915' },
+    { city_id: '229', city_name: 'Langkat', type: 'Kabupaten', postal_code: '20811' },
+  ],
+}
+
 export async function GET(req: NextRequest) {
   const provinceId = req.nextUrl.searchParams.get('province_id')
 
   if (!provinceId) {
-    return NextResponse.json({ error: 'province_id wajib diisi' }, { status: 400 })
+    return NextResponse.json({ error: 'province_id required' }, { status: 400 })
   }
 
   try {
     const cities = await getCities(provinceId)
-    return NextResponse.json({ cities })
+    if (cities.length > 0) {
+      return NextResponse.json({ cities })
+    }
+    throw new Error('empty')
   } catch {
-    return NextResponse.json({ cities: [] })
+    const fallback = FALLBACK_CITIES[provinceId] || []
+    return NextResponse.json({ cities: fallback })
   }
 }

@@ -1,34 +1,37 @@
 import Link from 'next/link'
 
 export const metadata = {
-  title: 'Menunggu Pembayaran',
+  title: 'Awaiting Payment',
 }
 
 export default function OrderPendingPage() {
   return (
-    <div className="mx-auto max-w-lg px-5 py-24 text-center">
-      <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center border-2 border-brand-900">
-        <svg className="h-8 w-8 text-brand-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+    <div className="mx-auto max-w-md px-5 py-32 text-center">
+      <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center border border-brand-950">
+        <svg className="h-6 w-6 text-brand-950" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
 
-      <h1 className="text-2xl font-bold uppercase tracking-wide text-brand-900">
-        Menunggu Pembayaran
+      <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
+        Awaiting Payment
       </h1>
-      <p className="mt-3 text-sm leading-relaxed text-brand-500">
-        Pesanan kamu sudah dibuat. Segera selesaikan pembayaran sebelum batas waktu yang ditentukan.
+      <p className="mt-4 text-sm leading-relaxed text-brand-400">
+        Your order has been created. Please complete payment before the deadline.
       </p>
       <p className="mt-2 text-sm text-brand-400">
-        Setelah pembayaran dikonfirmasi, kamu akan menerima notifikasi WhatsApp.
+        Once confirmed, you&apos;ll receive a WhatsApp notification.
       </p>
 
-      <div className="mt-10 flex flex-col gap-3">
+      <div className="mt-12 flex flex-col gap-4">
         <Link href="/products" className="btn-primary py-4">
-          LANJUT BELANJA
+          Continue Shopping
         </Link>
-        <Link href="/" className="text-xs font-semibold uppercase tracking-wider text-brand-400 transition-colors hover:text-brand-900">
-          Kembali ke Beranda
+        <Link
+          href="/"
+          className="text-[11px] uppercase tracking-widest text-brand-400 transition-colors hover:text-brand-950"
+        >
+          Back to Home
         </Link>
       </div>
     </div>

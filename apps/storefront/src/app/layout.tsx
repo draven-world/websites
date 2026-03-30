@@ -1,14 +1,16 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
-import { Montserrat } from 'next/font/google'
+import { Work_Sans } from 'next/font/google'
 import { CartProvider } from '@/providers/cart-provider'
+import { AuthProvider } from '@/providers/auth-provider'
 import { ToastProvider } from '@/providers/toast-provider'
 import './globals.css'
 
-const montserrat = Montserrat({
+const workSans = Work_Sans({
   subsets: ['latin'],
-  variable: '--font-montserrat',
+  variable: '--font-work-sans',
   display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
 })
 
 const MIDTRANS_CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
@@ -36,11 +38,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={montserrat.variable}>
-      <body className={montserrat.className}>
-        <CartProvider>
-          <ToastProvider>{children}</ToastProvider>
-        </CartProvider>
+    <html lang="id" className={workSans.variable}>
+      <body className={workSans.className}>
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </CartProvider>
+        </AuthProvider>
         {MIDTRANS_CLIENT_KEY && (
           <Script
             src={MIDTRANS_SNAP_URL}

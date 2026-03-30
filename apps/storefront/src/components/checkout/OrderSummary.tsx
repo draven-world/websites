@@ -3,19 +3,11 @@
 import Image from 'next/image'
 import { formatRupiah } from '@/lib/utils'
 import type { ShippingCost } from '@/app/(store)/checkout/page'
+import type { CartItem } from '@/providers/cart-provider'
 
 type Cart = {
-  items: Array<{
-    id: string
-    title: string
-    thumbnail: string | null
-    variant: { title: string }
-    quantity: number
-    unit_price: number
-    subtotal: number
-  }>
+  items: CartItem[]
   subtotal: number
-  tax_total: number
   total: number
 }
 
@@ -23,70 +15,59 @@ export default function OrderSummary({
   cart,
   shippingCost,
 }: {
-  cart: Cart | null
+  cart: Cart
   shippingCost: ShippingCost | null
 }) {
-  if (!cart) return null
-
   const grandTotal = cart.total + (shippingCost?.cost || 0)
 
   return (
-    <div className="border border-brand-100 bg-brand-50 p-6">
-      <h2 className="mb-5 text-sm font-bold uppercase tracking-wider text-brand-900">
-        Ringkasan Pesanan
+    <div className="border-t border-brand-950 pt-6">
+      <h2 className="text-[13px] uppercase tracking-widest text-brand-950">
+        Order Summary
       </h2>
 
-      <div className="space-y-3">
-        {cart.items.map((item: any) => (
+      <div className="mt-5 space-y-4">
+        {cart.items.map((item) => (
           <div key={item.id} className="flex gap-3">
-            <div className="relative h-14 w-11 flex-shrink-0 overflow-hidden bg-white">
+            <div className="relative h-16 w-12 flex-shrink-0 overflow-hidden bg-brand-100">
               {item.thumbnail ? (
                 <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
               ) : (
-                <div className="flex h-full items-center justify-center text-brand-300 text-xs">
-                  IMG
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="text-[8px] uppercase tracking-widest text-brand-300">No img</span>
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[12px] font-semibold uppercase tracking-wide text-brand-900 truncate">
-                {item.title}
-              </p>
+              <p className="truncate text-sm text-brand-950">{item.title}</p>
               <p className="text-xs text-brand-400">
-                {item.variant.title} &times; {item.quantity}
+                {item.variant} × {item.quantity}
               </p>
             </div>
-            <p className="text-sm font-bold text-brand-900">{formatRupiah(item.subtotal)}</p>
+            <p className="text-sm text-brand-950">{formatRupiah(item.price * item.quantity)}</p>
           </div>
         ))}
       </div>
 
-      <div className="mt-5 space-y-2 border-t border-brand-200 pt-5">
+      <div className="mt-6 space-y-2 border-t border-brand-200 pt-5">
         <div className="flex justify-between text-sm">
-          <span className="text-brand-500">Subtotal</span>
-          <span className="text-brand-900">{formatRupiah(cart.subtotal)}</span>
+          <span className="text-brand-400">Subtotal</span>
+          <span className="text-brand-950">{formatRupiah(cart.subtotal)}</span>
         </div>
 
         {shippingCost && (
           <div className="flex justify-between text-sm">
-            <span className="text-brand-500">
-              Ongkir ({shippingCost.courier} {shippingCost.service})
+            <span className="text-brand-400">
+              Shipping ({shippingCost.courier} {shippingCost.service})
             </span>
-            <span className="text-brand-900">{formatRupiah(shippingCost.cost)}</span>
-          </div>
-        )}
-
-        {cart.tax_total > 0 && (
-          <div className="flex justify-between text-sm">
-            <span className="text-brand-500">PPN</span>
-            <span className="text-brand-900">{formatRupiah(cart.tax_total)}</span>
+            <span className="text-brand-950">{formatRupiah(shippingCost.cost)}</span>
           </div>
         )}
 
         <div className="border-t border-brand-200 pt-3">
           <div className="flex justify-between">
-            <span className="text-sm font-bold text-brand-900">Total</span>
-            <span className="text-lg font-bold text-brand-900">{formatRupiah(grandTotal)}</span>
+            <span className="text-sm font-medium text-brand-950">Total</span>
+            <span className="text-lg font-medium text-brand-950">{formatRupiah(grandTotal)}</span>
           </div>
         </div>
       </div>

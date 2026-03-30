@@ -4,42 +4,41 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: '#f7f7f7',
-          100: '#e3e3e3',
-          200: '#c8c8c8',
-          300: '#a4a4a4',
-          400: '#818181',
-          500: '#666666',
-          600: '#515151',
-          700: '#434343',
-          800: '#383838',
-          900: '#1a1a1a',
-          950: '#0d0d0d',
+          50: '#fafafa',
+          100: '#f0f0f0',
+          200: '#e0e0e0',
+          300: '#b0b0b0',
+          400: '#808080',
+          500: '#606060',
+          600: '#404040',
+          700: '#303030',
+          800: '#202020',
+          900: '#141414',
+          950: '#0a0a0a',
         },
       },
       fontFamily: {
-        sans: ['Montserrat', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-work-sans)', 'Helvetica Neue', 'Arial', 'sans-serif'],
       },
-      borderRadius: {
-        btn: '0',
+      letterSpacing: {
+        tightest: '-0.05em',
+        tighter: '-0.03em',
+      },
+      maxWidth: {
+        container: '1400px',
       },
       animation: {
-        'slide-up': 'slide-up 0.3s ease-out',
-        'fade-in': 'fade-in 0.4s ease-out',
-        marquee: 'marquee 30s linear infinite',
+        'fade-in': 'fade-in 0.6s ease-out',
+        'slide-up': 'slide-up 0.4s ease-out',
       },
       keyframes: {
-        'slide-up': {
-          '0%': { opacity: '0', transform: 'translateY(0.5rem)' },
-          '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
         'fade-in': {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
-        marquee: {
-          '0%': { transform: 'translateX(0%)' },
-          '100%': { transform: 'translateX(-50%)' },
+        'slide-up': {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
     },

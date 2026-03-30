@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 
 type Banner = {
   title: string
+  subtitle?: string
   image: string | null
   link: string | null
 }
@@ -23,7 +24,7 @@ export default function HeroBanner({ banners }: { banners: Banner[] }) {
     if (slides.length <= 1) return
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length)
-    }, 5000)
+    }, 6000)
     return () => clearInterval(timer)
   }, [slides.length])
 
@@ -31,46 +32,43 @@ export default function HeroBanner({ banners }: { banners: Banner[] }) {
 
   return (
     <section className="relative">
-      <div className="relative h-[85vh] min-h-[500px] w-full overflow-hidden bg-brand-900">
+      <div className="relative h-[90vh] min-h-[600px] w-full overflow-hidden bg-brand-950">
         {slide.image && (
           <Image
             src={slide.image}
             alt={slide.title || 'DRAVEN'}
             fill
-            className="object-cover"
+            className="object-cover opacity-80 transition-opacity duration-1000"
             priority
           />
         )}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-        {/* Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-end px-5 pb-20 text-center md:pb-24">
-          {slide.title && (
-            <h2 className="text-3xl font-extrabold uppercase tracking-wide text-white md:text-5xl">
-              {slide.title}
-            </h2>
-          )}
+        {/* Content — bottom left, editorial style */}
+        <div className="absolute inset-0 flex flex-col justify-end px-8 pb-16 md:px-16 md:pb-20">
           <Link
             href={slide.link || '/products'}
-            className="mt-6 border border-white/80 px-10 py-3.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-brand-900"
+            className="group inline-flex items-center gap-3 text-[13px] uppercase tracking-widest text-white transition-opacity hover:opacity-60"
           >
-            Shop Here
+            Shop Collection
+            <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
           </Link>
         </div>
       </div>
 
-      {/* Dots */}
+      {/* Progress bar */}
       {slides.length > 1 && (
-        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-2">
+        <div className="absolute bottom-0 left-0 right-0 flex">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-[3px] transition-all ${i === current ? 'w-8 bg-white' : 'w-3 bg-white/40'
-                }`}
+              className="flex-1 py-3"
               aria-label={`Slide ${i + 1}`}
-            />
+            >
+              <div className={`h-[2px] transition-all duration-300 ${i === current ? 'bg-white' : 'bg-white/20'}`} />
+            </button>
           ))}
         </div>
       )}

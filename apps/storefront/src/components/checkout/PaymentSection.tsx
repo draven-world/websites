@@ -1,19 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { useCart } from '@/providers/cart-provider'
+import { useAuth } from '@/providers/auth-provider'
 import { formatRupiah } from '@/lib/utils'
 import type { ShippingAddress, ShippingCost } from '@/app/(store)/checkout/page'
+import type { CartItem } from '@/providers/cart-provider'
 
 type Cart = {
-  id: string
-  items: Array<{
-    id: string
-    title: string
-    quantity: number
-    unit_price: number
-  }>
-  total: number
+  items: CartItem[]
   subtotal: number
+  total: number
 }
 
 export default function PaymentSection({
@@ -29,6 +26,8 @@ export default function PaymentSection({
 }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const { clearCart } = useCart()
+  const { user, addOrder } = useAuth()
 
   const grandTotal = cart.total + shippingCost.cost
 
@@ -39,17 +38,16 @@ export default function PaymentSection({
     try {
       const orderId = `DRV-${Date.now()}`
 
-      const items = cart.items?.map((item) => ({
+      const items = cart.items.map((item) => ({
         id: item.id,
         name: item.title,
-        price: item.unit_price,
+        price: item.price,
         quantity: item.quantity,
-      })) || []
+      }))
 
-      // Add shipping as item
       items.push({
         id: 'shipping',
-        name: `Ongkir ${shippingCost.courier} ${shippingCost.service}`,
+        name: `Shipping ${shippingCost.courier} ${shippingCost.service}`,
         price: shippingCost.cost,
         quantity: 1,
       })
@@ -69,29 +67,76 @@ export default function PaymentSection({
       const data = await res.json()
 
       if (!data.token) {
-        throw new Error(data.error || 'Gagal membuat transaksi')
+        throw new Error(data.error || 'Failed to create transaction')
       }
 
       if (typeof window !== 'undefined' && (window as any).snap) {
         ;(window as any).snap.pay(data.token, {
           onSuccess: () => {
+            if (user) {
+              addOrder({
+                items: cart.items.map((item) => ({
+                  title: item.title,
+                  variant: item.variant,
+                  quantity: item.quantity,
+                  price: item.price,
+                  thumbnail: item.thumbnail,
+                })),
+                subtotal: cart.subtotal,
+                shipping_cost: shippingCost.cost,
+                total: grandTotal,
+                shipping_address: {
+                  name: `${address.first_name} ${address.last_name}`.trim(),
+                  address: address.address_1,
+                  city: address.city,
+                  province: address.province,
+                  phone: address.phone,
+                },
+                shipping_method: `${shippingCost.courier} ${shippingCost.service}`,
+                status: 'paid',
+              })
+            }
+            clearCart()
             window.location.href = '/order/success'
           },
           onPending: () => {
+            if (user) {
+              addOrder({
+                items: cart.items.map((item) => ({
+                  title: item.title,
+                  variant: item.variant,
+                  quantity: item.quantity,
+                  price: item.price,
+                  thumbnail: item.thumbnail,
+                })),
+                subtotal: cart.subtotal,
+                shipping_cost: shippingCost.cost,
+                total: grandTotal,
+                shipping_address: {
+                  name: `${address.first_name} ${address.last_name}`.trim(),
+                  address: address.address_1,
+                  city: address.city,
+                  province: address.province,
+                  phone: address.phone,
+                },
+                shipping_method: `${shippingCost.courier} ${shippingCost.service}`,
+                status: 'pending',
+              })
+            }
             window.location.href = '/order/pending'
           },
           onError: () => {
-            setError('Pembayaran gagal. Silakan coba lagi.')
+            setError('Payment failed. Please try again.')
           },
           onClose: () => {
-            setError('Popup pembayaran ditutup. Silakan coba lagi jika belum membayar.')
+            setError('Payment window closed. Try again if you haven\'t paid.')
           },
         })
       } else {
-        setError('Midtrans belum dimuat. Refresh halaman dan coba lagi.')
+        setError('Payment gateway not loaded. Refresh the page and try again.')
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Terjadi kesalahan'
+      const message = err instanceof Error ? err.message : 'Something went wrong'
       setError(message)
     } finally {
       setLoading(false)
@@ -99,75 +144,66 @@ export default function PaymentSection({
   }
 
   return (
-    <div className="border border-brand-100 bg-white p-6 md:p-8">
-      <h2 className="mb-6 text-sm font-bold uppercase tracking-wider text-brand-900">
-        Pembayaran
+    <div>
+      <h2 className="text-[13px] uppercase tracking-widest text-brand-950">
+        Payment
       </h2>
 
-      {/* Address Summary */}
-      <div className="mb-6 bg-brand-50 p-5">
-        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-400">
-          Alamat Pengiriman
-        </h3>
-        <p className="text-sm text-brand-700">
-          {address.first_name} {address.last_name}
-        </p>
-        <p className="text-sm text-brand-700">{address.address_1}</p>
-        <p className="text-sm text-brand-700">
-          {address.city}, {address.province} {address.postal_code}
-        </p>
-        <p className="text-sm text-brand-700">{address.phone}</p>
+      {/* Address & Shipping Summary */}
+      <div className="mt-6 border-t border-brand-200 pt-6">
+        <p className="text-[11px] uppercase tracking-widest text-brand-400">Shipping to</p>
+        <div className="mt-2 text-sm text-brand-500">
+          <p>{address.first_name} {address.last_name}</p>
+          <p>{address.address_1}</p>
+          <p>{address.city}, {address.province} {address.postal_code}</p>
+          <p>{address.phone}</p>
+        </div>
 
-        <div className="mt-4 border-t border-brand-200 pt-4">
-          <p className="text-sm text-brand-700">
-            <span className="font-semibold">Kurir:</span> {shippingCost.courier} — {shippingCost.service}
-          </p>
-          <p className="text-sm text-brand-700">
-            <span className="font-semibold">Ongkir:</span> {formatRupiah(shippingCost.cost)}
-          </p>
-          <p className="text-sm text-brand-700">
-            <span className="font-semibold">Estimasi:</span> {shippingCost.etd} hari
-          </p>
+        <div className="mt-4 text-sm text-brand-500">
+          <p>{shippingCost.courier} — {shippingCost.service} · {formatRupiah(shippingCost.cost)}</p>
+          <p className="text-xs text-brand-400">Est. {shippingCost.etd} days</p>
         </div>
       </div>
 
       {/* Payment Methods */}
-      <div className="mb-6">
-        <h3 className="mb-3 text-xs font-bold uppercase tracking-wider text-brand-400">
-          Metode Pembayaran Tersedia
-        </h3>
-        <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-semibold text-brand-500">
+      <div className="mt-8 border-t border-brand-200 pt-6">
+        <p className="text-[11px] uppercase tracking-widest text-brand-400">Available Methods</p>
+        <div className="mt-3 flex flex-wrap gap-2">
           {['QRIS', 'GoPay', 'ShopeePay', 'BCA VA', 'BNI VA', 'Mandiri VA', 'OVO', 'DANA', 'Indomaret'].map((m) => (
-            <div key={m} className="border border-brand-200 py-2.5">{m}</div>
+            <span key={m} className="border border-brand-200 px-3 py-1.5 text-[11px] tracking-wider text-brand-400">
+              {m}
+            </span>
           ))}
         </div>
-        <p className="mt-2 text-[11px] text-brand-400">
-          Pilih metode pembayaran di jendela pembayaran setelah klik &quot;Bayar Sekarang&quot;
+        <p className="mt-3 text-xs text-brand-400">
+          Select payment method after clicking &quot;Pay Now&quot;
         </p>
       </div>
 
       {/* Total */}
-      <div className="mb-6 bg-brand-900 p-5 text-center text-white">
-        <p className="text-xs uppercase tracking-widest text-white/60">Total Pembayaran</p>
-        <p className="mt-1 text-2xl font-bold">{formatRupiah(grandTotal)}</p>
+      <div className="mt-8 border-t border-brand-950 pt-6">
+        <div className="flex items-baseline justify-between">
+          <span className="text-[11px] uppercase tracking-widest text-brand-400">Total</span>
+          <span className="text-xl font-medium text-brand-950">{formatRupiah(grandTotal)}</span>
+        </div>
       </div>
 
       {error && (
-        <div className="mb-4 border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mt-4 border border-red-200 bg-red-50 p-3 text-sm text-red-600">
           {error}
         </div>
       )}
 
-      <div className="flex gap-3">
+      <div className="mt-8 flex gap-3">
         <button onClick={onBack} className="btn-secondary flex-1 py-4">
-          KEMBALI
+          Back
         </button>
         <button
           onClick={handlePayment}
           disabled={loading}
           className="btn-primary flex-1 py-4"
         >
-          {loading ? 'MEMPROSES...' : 'BAYAR SEKARANG'}
+          {loading ? 'Processing...' : 'Pay Now'}
         </button>
       </div>
     </div>

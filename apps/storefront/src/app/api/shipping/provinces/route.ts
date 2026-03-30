@@ -2,18 +2,20 @@ import { NextResponse } from 'next/server'
 import { getProvinces } from '@/lib/rajaongkir'
 
 // Fallback data when API key not set
+// Provinces that have fallback city data available (prioritized)
 const FALLBACK_PROVINCES = [
-  { province_id: '1', province: 'Bali' },
-  { province_id: '2', province: 'Bangka Belitung' },
-  { province_id: '3', province: 'Banten' },
-  { province_id: '4', province: 'Bengkulu' },
-  { province_id: '5', province: 'DI Yogyakarta' },
   { province_id: '6', province: 'DKI Jakarta' },
-  { province_id: '7', province: 'Gorontalo' },
-  { province_id: '8', province: 'Jambi' },
   { province_id: '9', province: 'Jawa Barat' },
   { province_id: '10', province: 'Jawa Tengah' },
   { province_id: '11', province: 'Jawa Timur' },
+  { province_id: '3', province: 'Banten' },
+  { province_id: '5', province: 'DI Yogyakarta' },
+  { province_id: '1', province: 'Bali' },
+  { province_id: '34', province: 'Sumatera Utara' },
+  { province_id: '2', province: 'Bangka Belitung' },
+  { province_id: '4', province: 'Bengkulu' },
+  { province_id: '7', province: 'Gorontalo' },
+  { province_id: '8', province: 'Jambi' },
   { province_id: '12', province: 'Kalimantan Barat' },
   { province_id: '13', province: 'Kalimantan Selatan' },
   { province_id: '14', province: 'Kalimantan Tengah' },
@@ -36,7 +38,6 @@ const FALLBACK_PROVINCES = [
   { province_id: '31', province: 'Sulawesi Utara' },
   { province_id: '32', province: 'Sumatera Barat' },
   { province_id: '33', province: 'Sumatera Selatan' },
-  { province_id: '34', province: 'Sumatera Utara' },
 ]
 
 export async function GET() {

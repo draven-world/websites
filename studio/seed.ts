@@ -3,15 +3,33 @@
  *
  * Jalankan dengan:
  *   cd studio
- *   npx sanity exec seed.ts --with-user-token
+ *   npx tsx seed.ts
  *
- * Script ini akan membuat data awal: banner, announcement, FAQ, kategori, halaman statis, dan promo.
+ * Pastikan set environment variable SANITY_TOKEN terlebih dahulu:
+ *   - Buat token di https://www.sanity.io/manage → Project → API → Tokens → Add API Token (Editor)
+ *   - Set: export SANITY_TOKEN="your-token-here"
+ *
+ * Script ini akan membuat data awal: banner, announcement, FAQ, kategori, halaman statis, produk, dan promo.
  * Aman dijalankan ulang — menggunakan _id tetap sehingga data lama di-overwrite, bukan duplikat.
  */
 
-import { getCliClient } from 'sanity/cli'
+import { createClient } from '@sanity/client'
 
-const client = getCliClient({ apiVersion: '2024-01-01' })
+const token = process.env.SANITY_TOKEN
+if (!token) {
+  console.error('❌ SANITY_TOKEN belum di-set!')
+  console.error('   Buat token di: https://www.sanity.io/manage → Project → API → Tokens')
+  console.error('   Lalu jalankan: export SANITY_TOKEN="your-token" && npx tsx seed.ts')
+  process.exit(1)
+}
+
+const client = createClient({
+  projectId: '01avolry',
+  dataset: 'production',
+  apiVersion: '2024-01-01',
+  token,
+  useCdn: false,
+})
 
 // Helper: create a transaction
 const tx = client.transaction()
@@ -639,24 +657,361 @@ const promos = [
   },
 ]
 
+// ─── PRODUK ─────────────────────────────────────────────────
+
+const products = [
+  // KAOS
+  {
+    _id: 'product-kaos-grafis-vol1',
+    _type: 'product',
+    title: 'Kaos Grafis Draven Vol.1',
+    handle: { _type: 'slug', current: 'kaos-grafis-draven-vol1' },
+    shortDescription: 'Kaos cotton combed 30s dengan desain grafis eksklusif DRAVEN edisi pertama.',
+    category: { _type: 'reference', _ref: 'cat-kaos' },
+    tags: ['kaos', 'bestseller', 'grafis'],
+    price: 189000,
+    compareAtPrice: 249000,
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+      { _key: 'c2', _type: 'object', name: 'Putih', hex: '#FFFFFF' },
+    ],
+    stock: 120,
+    weight: 200,
+    sku: 'DRV-KG-001',
+    status: 'active',
+    featured: true,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Kaos grafis premium dari koleksi perdana DRAVEN. Material cotton combed 30s yang lembut dan adem, cocok untuk iklim tropis Indonesia. Desain eksklusif dengan teknik sablon plastisol berkualitas tinggi yang tahan lama.', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p2', style: 'h3', markDefs: [],
+        children: [{ _type: 'span', _key: 'p2s', text: 'Detail Produk', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p3', style: 'normal', markDefs: [], listItem: 'bullet', level: 1,
+        children: [{ _type: 'span', _key: 'p3s', text: 'Material: Cotton Combed 30s (180 GSM)', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p4', style: 'normal', markDefs: [], listItem: 'bullet', level: 1,
+        children: [{ _type: 'span', _key: 'p4s', text: 'Sablon: Plastisol high-density', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p5', style: 'normal', markDefs: [], listItem: 'bullet', level: 1,
+        children: [{ _type: 'span', _key: 'p5s', text: 'Fit: Regular fit', marks: [] }],
+      },
+    ],
+  },
+  {
+    _id: 'product-kaos-essential-black',
+    _type: 'product',
+    title: 'Kaos Essential Hitam',
+    handle: { _type: 'slug', current: 'kaos-essential-hitam' },
+    shortDescription: 'Kaos polos premium warna hitam, must-have untuk daily wear.',
+    category: { _type: 'reference', _ref: 'cat-kaos' },
+    tags: ['kaos', 'essential', 'polos'],
+    price: 149000,
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+    ],
+    stock: 200,
+    weight: 200,
+    sku: 'DRV-KE-001',
+    status: 'active',
+    featured: false,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Kaos polos hitam dari lini Essential DRAVEN. Dibuat dari cotton combed 24s yang tebal dan kokoh. Warna hitam pekat yang tidak mudah luntur. Cocok untuk mix & match dengan outfit apapun.', marks: [] }],
+      },
+    ],
+  },
+  {
+    _id: 'product-kaos-oversize-shadow',
+    _type: 'product',
+    title: 'Kaos Oversize "Shadow"',
+    handle: { _type: 'slug', current: 'kaos-oversize-shadow' },
+    shortDescription: 'Kaos oversize dengan desain shadow print, cutting modern.',
+    category: { _type: 'reference', _ref: 'cat-kaos' },
+    tags: ['kaos', 'oversize', 'new-arrival'],
+    price: 219000,
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Abu-Abu Gelap', hex: '#333333' },
+      { _key: 'c2', _type: 'object', name: 'Hitam', hex: '#000000' },
+    ],
+    stock: 80,
+    weight: 250,
+    sku: 'DRV-KO-001',
+    status: 'active',
+    featured: true,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Kaos oversize dengan cutting drop-shoulder yang modern. Desain shadow print dengan teknik discharge yang menghasilkan efek pudar natural. Material cotton combed 24s (220 GSM) yang tebal dan berat jatuh sempurna.', marks: [] }],
+      },
+    ],
+  },
+
+  // HOODIE
+  {
+    _id: 'product-hoodie-classic',
+    _type: 'product',
+    title: 'Hoodie Classic Draven',
+    handle: { _type: 'slug', current: 'hoodie-classic-draven' },
+    shortDescription: 'Hoodie fleece premium dengan bordir logo DRAVEN di dada.',
+    category: { _type: 'reference', _ref: 'cat-hoodie' },
+    tags: ['hoodie', 'bestseller', 'classic'],
+    price: 389000,
+    compareAtPrice: 459000,
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+      { _key: 'c2', _type: 'object', name: 'Abu-Abu', hex: '#808080' },
+      { _key: 'c3', _type: 'object', name: 'Navy', hex: '#1B1B3A' },
+    ],
+    stock: 65,
+    weight: 550,
+    sku: 'DRV-HC-001',
+    status: 'active',
+    featured: true,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Hoodie classic DRAVEN dari bahan fleece premium 320 GSM. Hangat, tebal, dan nyaman untuk daily wear. Logo DRAVEN dibordir dengan teknik chain-stitch di bagian dada kiri. Tersedia dengan kangaroo pocket dan drawstring hood.', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p2', style: 'h3', markDefs: [],
+        children: [{ _type: 'span', _key: 'p2s', text: 'Detail Produk', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p3', style: 'normal', markDefs: [], listItem: 'bullet', level: 1,
+        children: [{ _type: 'span', _key: 'p3s', text: 'Material: Fleece Premium 320 GSM', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p4', style: 'normal', markDefs: [], listItem: 'bullet', level: 1,
+        children: [{ _type: 'span', _key: 'p4s', text: 'Logo: Bordir chain-stitch', marks: [] }],
+      },
+      {
+        _type: 'block', _key: 'p5', style: 'normal', markDefs: [], listItem: 'bullet', level: 1,
+        children: [{ _type: 'span', _key: 'p5s', text: 'Fit: Regular fit, unisex', marks: [] }],
+      },
+    ],
+  },
+  {
+    _id: 'product-hoodie-zip-urban',
+    _type: 'product',
+    title: 'Hoodie Zip Urban',
+    handle: { _type: 'slug', current: 'hoodie-zip-urban' },
+    shortDescription: 'Hoodie zipper dengan desain urban minimalis.',
+    category: { _type: 'reference', _ref: 'cat-hoodie' },
+    tags: ['hoodie', 'zipper', 'urban'],
+    price: 429000,
+    sizes: ['M', 'L', 'XL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+      { _key: 'c2', _type: 'object', name: 'Olive', hex: '#556B2F' },
+    ],
+    stock: 45,
+    weight: 600,
+    sku: 'DRV-HZ-001',
+    status: 'active',
+    featured: false,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Hoodie zip-up dengan desain urban minimalis. Zipper YKK berkualitas tinggi, double-lined hood, dan split kangaroo pocket. Material fleece CVC (Cotton Viscose) 300 GSM yang lembut di dalam.', marks: [] }],
+      },
+    ],
+  },
+
+  // CELANA
+  {
+    _id: 'product-cargo-tactical',
+    _type: 'product',
+    title: 'Celana Cargo Tactical',
+    handle: { _type: 'slug', current: 'celana-cargo-tactical' },
+    shortDescription: 'Celana cargo 6 pocket dengan material ripstop tahan lama.',
+    category: { _type: 'reference', _ref: 'cat-celana' },
+    tags: ['celana', 'cargo', 'tactical'],
+    price: 329000,
+    compareAtPrice: 399000,
+    sizes: ['28', '30', '32', '34', '36'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+      { _key: 'c2', _type: 'object', name: 'Khaki', hex: '#C3B091' },
+    ],
+    stock: 55,
+    weight: 450,
+    sku: 'DRV-CT-001',
+    status: 'active',
+    featured: true,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Celana cargo tactical DRAVEN dengan 6 pocket fungsional. Material ripstop canvas yang tahan sobek dan awet. Dilengkapi dengan adjustable ankle strap dan elastic waistband untuk kenyamanan maksimal.', marks: [] }],
+      },
+    ],
+  },
+  {
+    _id: 'product-jogger-street',
+    _type: 'product',
+    title: 'Jogger Pants Street',
+    handle: { _type: 'slug', current: 'jogger-pants-street' },
+    shortDescription: 'Celana jogger dengan cutting slim-tapered, nyaman untuk harian.',
+    category: { _type: 'reference', _ref: 'cat-celana' },
+    tags: ['celana', 'jogger', 'casual'],
+    price: 279000,
+    sizes: ['S', 'M', 'L', 'XL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+      { _key: 'c2', _type: 'object', name: 'Abu-Abu', hex: '#808080' },
+    ],
+    stock: 90,
+    weight: 350,
+    sku: 'DRV-JS-001',
+    status: 'active',
+    featured: false,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Jogger pants dengan cutting slim-tapered yang modern. Material baby terry 280 GSM, lembut dan breathable. Elastic waistband dengan drawstring, side pocket, dan ribbed ankle cuff.', marks: [] }],
+      },
+    ],
+  },
+
+  // JAKET
+  {
+    _id: 'product-bomber-draven',
+    _type: 'product',
+    title: 'Bomber Jacket Draven',
+    handle: { _type: 'slug', current: 'bomber-jacket-draven' },
+    shortDescription: 'Jaket bomber MA-1 dengan bordir DRAVEN di punggung.',
+    category: { _type: 'reference', _ref: 'cat-jaket' },
+    tags: ['jaket', 'bomber', 'premium'],
+    price: 549000,
+    compareAtPrice: 699000,
+    sizes: ['M', 'L', 'XL', 'XXL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+      { _key: 'c2', _type: 'object', name: 'Army Green', hex: '#4B5320' },
+    ],
+    stock: 30,
+    weight: 700,
+    sku: 'DRV-BJ-001',
+    status: 'active',
+    featured: true,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Jaket bomber MA-1 style dengan material taslan water-resistant. Bordir besar logo DRAVEN di punggung dan bordir kecil di dada. Lining satin halus, ribbed collar, cuff, dan hem. Zipper YKK premium.', marks: [] }],
+      },
+    ],
+  },
+  {
+    _id: 'product-windbreaker-mono',
+    _type: 'product',
+    title: 'Windbreaker Monochrome',
+    handle: { _type: 'slug', current: 'windbreaker-monochrome' },
+    shortDescription: 'Windbreaker ringan water-resistant dengan desain monochrome.',
+    category: { _type: 'reference', _ref: 'cat-jaket' },
+    tags: ['jaket', 'windbreaker', 'new-arrival'],
+    price: 479000,
+    sizes: ['M', 'L', 'XL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam/Abu', hex: '#1A1A1A' },
+    ],
+    stock: 40,
+    weight: 350,
+    sku: 'DRV-WM-001',
+    status: 'active',
+    featured: false,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Windbreaker ringan dengan desain color-block monochrome. Material parasut micro water-resistant. Packable — bisa dilipat masuk ke pocket sendiri. Cocok untuk outdoor activity dan traveling.', marks: [] }],
+      },
+    ],
+  },
+
+  // AKSESORIS
+  {
+    _id: 'product-topi-snapback',
+    _type: 'product',
+    title: 'Snapback Cap Draven',
+    handle: { _type: 'slug', current: 'snapback-cap-draven' },
+    shortDescription: 'Topi snapback dengan bordir logo DRAVEN 3D.',
+    category: { _type: 'reference', _ref: 'cat-aksesoris' },
+    tags: ['aksesoris', 'topi', 'snapback'],
+    price: 159000,
+    sizes: ['ALL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Hitam', hex: '#000000' },
+      { _key: 'c2', _type: 'object', name: 'Putih', hex: '#FFFFFF' },
+    ],
+    stock: 100,
+    weight: 120,
+    sku: 'DRV-SC-001',
+    status: 'active',
+    featured: false,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Topi snapback dengan bordir 3D logo DRAVEN di depan. Material cotton twill premium, adjustable snap closure di belakang. One size fits all.', marks: [] }],
+      },
+    ],
+  },
+  {
+    _id: 'product-totebag-canvas',
+    _type: 'product',
+    title: 'Tote Bag Canvas Draven',
+    handle: { _type: 'slug', current: 'totebag-canvas-draven' },
+    shortDescription: 'Tote bag canvas tebal dengan print DRAVEN artwork.',
+    category: { _type: 'reference', _ref: 'cat-aksesoris' },
+    tags: ['aksesoris', 'tas', 'totebag'],
+    price: 129000,
+    sizes: ['ALL'],
+    colors: [
+      { _key: 'c1', _type: 'object', name: 'Natural', hex: '#F5F5DC' },
+      { _key: 'c2', _type: 'object', name: 'Hitam', hex: '#000000' },
+    ],
+    stock: 150,
+    weight: 180,
+    sku: 'DRV-TB-001',
+    status: 'active',
+    featured: false,
+    description: [
+      {
+        _type: 'block', _key: 'p1', style: 'normal', markDefs: [],
+        children: [{ _type: 'span', _key: 'p1s', text: 'Tote bag dari canvas 12oz yang tebal dan kokoh. Print artwork eksklusif DRAVEN dengan teknik sablon manual. Kapasitas besar, cocok untuk daily carry, kuliah, atau belanja. Handle panjang untuk shoulder carry.', marks: [] }],
+      },
+    ],
+  },
+]
+
 // ─── EXECUTE SEED ───────────────────────────────────────────
 
 async function seed() {
   console.log('🌱 Seeding Sanity data for DRAVEN...\n')
 
   const allDocs = [
+    ...categories, // seed categories first (products reference them)
     ...banners,
     ...announcements,
-    ...categories,
     ...faqs,
     ...pages,
     ...promos,
+    ...products,
   ]
 
   for (const doc of allDocs) {
     tx.createOrReplace(doc as any)
   }
 
+  console.log(`👕 ${products.length} produk`)
   console.log(`📝 ${banners.length} banners`)
   console.log(`📢 ${announcements.length} announcements`)
   console.log(`📁 ${categories.length} kategori`)

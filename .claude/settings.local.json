@@ -28,7 +28,17 @@
       "Bash(mkdir -p \"D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app\\\\api\\\\shipping\\\\cities\")",
       "Bash(mkdir -p \"D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app\\\\api\\\\shipping\\\\cost\")",
       "Bash(ls:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(SANITY_TOKEN=\"skSfgm62qGsIBEDACG6AxNEe4fTeQFQ2eRVzDXMmXhSH964i8OfbkxxhL81UYsltihHRBEvs942ig3Vztg6ubArYdmitgUBj5BmphheQnm54e7gFTFYjwsgWG4W3ty8T6HBJWaXijQ0LT3sTVLmuthLZiCxFhEzmAZoxlBvQXIU76qFrPitD\" npx tsx seed.ts)",
+      "Bash(node -e \":*)",
+      "WebFetch(domain:www.halfdays.com)",
+      "Bash(find 'D:/THE PROJECT/draven/packages' -name *.ts -o -name *.js -o -name *.json)",
+      "Bash(pnpm --filter storefront exec tsc --noEmit)",
+      "Bash(curl -s -H \"key: uqzjafBs47b97c17cc49bea2ILLwpAVx\" \"https://api.rajaongkir.com/starter/province\")",
+      "WebSearch",
+      "WebFetch(domain:dev-collaborator.komerce.id)",
+      "WebFetch(domain:rajaongkir.com)",
+      "WebFetch(domain:www.rajaongkir.com)"
     ]
   }
 }

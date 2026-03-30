@@ -1,5 +1,6 @@
 import Medusa from '@medusajs/medusa-js'
 import { dummyProducts } from './dummy-products'
+import { getSanityProducts, getSanityProduct } from './sanity'
 
 export const medusa = new Medusa({
   baseUrl: process.env.NEXT_PUBLIC_MEDUSA_URL || 'http://localhost:9000',
@@ -8,6 +9,11 @@ export const medusa = new Medusa({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getProducts(): Promise<any[]> {
+  // 1. Try Sanity first
+  const sanityProducts = await getSanityProducts()
+  if (sanityProducts.length > 0) return sanityProducts
+
+  // 2. Try Medusa
   try {
     const { products } = await medusa.products.list({
       limit: 20,
@@ -17,11 +23,18 @@ export async function getProducts(): Promise<any[]> {
   } catch {
     // fall through to dummy data
   }
+
+  // 3. Fallback to dummy products
   return dummyProducts
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function getProduct(handle: string): Promise<any | null> {
+  // 1. Try Sanity first
+  const sanityProduct = await getSanityProduct(handle)
+  if (sanityProduct) return sanityProduct
+
+  // 2. Try Medusa
   try {
     const { products } = await medusa.products.list({
       handle,
@@ -31,6 +44,8 @@ export async function getProduct(handle: string): Promise<any | null> {
   } catch {
     // fall through to dummy data
   }
+
+  // 3. Fallback to dummy product
   const dummy = dummyProducts.find((p) => p.handle === handle)
   if (!dummy) return null
   return {

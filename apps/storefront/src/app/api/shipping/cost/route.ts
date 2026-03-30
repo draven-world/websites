@@ -10,10 +10,7 @@ export async function POST(req: NextRequest) {
     const { destination, weight, courier } = body
 
     if (!destination || !courier) {
-      return NextResponse.json(
-        { error: 'destination dan courier wajib diisi' },
-        { status: 400 },
-      )
+      return NextResponse.json({ error: 'destination dan courier wajib diisi' }, { status: 400 })
     }
 
     const costs = await getShippingCost(

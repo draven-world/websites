@@ -87,21 +87,21 @@ export default function ShippingOptions({
   allOptions.sort((a, b) => a.cost - b.cost)
 
   return (
-    <div className="border border-brand-100 bg-white p-6 md:p-8">
-      <h2 className="mb-2 text-sm font-bold uppercase tracking-wider text-brand-900">
-        Pilih Pengiriman
+    <div>
+      <h2 className="text-[13px] uppercase tracking-widest text-brand-950">
+        Select Shipping
       </h2>
-      <p className="mb-6 text-sm text-brand-400">
-        Kirim ke: {address.city}, {address.province}
+      <p className="mt-2 text-sm text-brand-400">
+        Deliver to: {address.city}, {address.province}
       </p>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="h-6 w-6 animate-spin border-2 border-brand-900 border-t-transparent" />
-          <span className="ml-3 text-sm text-brand-400">Mengecek ongkos kirim...</span>
+        <div className="flex items-center justify-center py-16">
+          <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
+          <span className="ml-3 text-sm text-brand-400">Checking rates...</span>
         </div>
       ) : allOptions.length > 0 ? (
-        <div className="space-y-2">
+        <div className="mt-6 space-y-2">
           {allOptions.map((opt) => {
             const key = `${opt.courier}-${opt.service}`
             const isSelected = selected && `${selected.courier}-${selected.service}` === key
@@ -109,41 +109,41 @@ export default function ShippingOptions({
               <button
                 key={key}
                 onClick={() => setSelected(opt)}
-                className={`flex w-full items-center justify-between border p-4 text-left transition-colors ${
+                className={`flex w-full items-center justify-between p-4 text-left transition-colors ${
                   isSelected
-                    ? 'border-brand-900 bg-brand-50'
-                    : 'border-brand-200 hover:border-brand-400'
+                    ? 'border border-brand-950 bg-brand-50'
+                    : 'border border-brand-100 hover:border-brand-300'
                 }`}
               >
                 <div>
-                  <p className="text-sm font-semibold text-brand-900">
+                  <p className="text-sm text-brand-950">
                     {opt.courier} — {opt.service}
                   </p>
-                  <p className="text-xs text-brand-400">
-                    {opt.description} &middot; Estimasi {opt.etd} hari
+                  <p className="mt-0.5 text-xs text-brand-400">
+                    {opt.description} · Est. {opt.etd} days
                   </p>
                 </div>
-                <p className="text-sm font-bold text-brand-900">{formatRupiah(opt.cost)}</p>
+                <p className="text-sm text-brand-950">{formatRupiah(opt.cost)}</p>
               </button>
             )
           })}
         </div>
       ) : (
-        <div className="py-8 text-center text-sm text-brand-400">
-          Tidak ada opsi pengiriman tersedia. Coba ubah alamat tujuan.
+        <div className="mt-6 py-12 text-center text-sm text-brand-400">
+          No shipping options available. Try a different address.
         </div>
       )}
 
       <div className="mt-8 flex gap-3">
         <button onClick={onBack} className="btn-secondary flex-1 py-4">
-          KEMBALI
+          Back
         </button>
         <button
           onClick={handleSubmit}
           disabled={!selected}
           className="btn-primary flex-1 py-4"
         >
-          LANJUT BAYAR
+          Continue to Payment
         </button>
       </div>
     </div>

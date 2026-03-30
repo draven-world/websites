@@ -8,6 +8,8 @@ const deskStructure = (S: StructureBuilder) =>
   S.list()
     .title('Draven CMS')
     .items([
+      S.documentTypeListItem('product').title('👕 Produk'),
+      S.divider(),
       S.listItem()
         .title('🏠 Homepage')
         .child(
@@ -28,8 +30,8 @@ const deskStructure = (S: StructureBuilder) =>
 export default defineConfig({
   name: 'draven-cms',
   title: 'Draven CMS',
-  projectId: process.env.SANITY_STUDIO_PROJECT_ID || '01avolry',
-  dataset: process.env.SANITY_STUDIO_DATASET || 'production',
+  projectId: '01avolry',
+  dataset: 'production',
   plugins: [
     structureTool({ structure: deskStructure }),
     visionTool(),

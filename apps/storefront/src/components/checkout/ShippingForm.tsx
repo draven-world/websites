@@ -81,11 +81,11 @@ export default function ShippingForm({
 
   function validate(): boolean {
     const e: Partial<Record<keyof ShippingAddress, string>> = {}
-    if (!form.first_name.trim()) e.first_name = 'Nama depan wajib diisi'
-    if (!form.phone.trim()) e.phone = 'No. HP wajib diisi'
-    if (!form.address_1.trim()) e.address_1 = 'Alamat wajib diisi'
-    if (!form.province_id) e.province = 'Pilih provinsi'
-    if (!form.city_id) e.city = 'Pilih kota'
+    if (!form.first_name.trim()) e.first_name = 'Required'
+    if (!form.phone.trim()) e.phone = 'Required'
+    if (!form.address_1.trim()) e.address_1 = 'Required'
+    if (!form.province_id) e.province = 'Select province'
+    if (!form.city_id) e.city = 'Select city'
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -98,37 +98,43 @@ export default function ShippingForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border border-brand-100 bg-white p-6 md:p-8">
-      <h2 className="mb-6 text-sm font-bold uppercase tracking-wider text-brand-900">
-        Alamat Pengiriman
+    <form onSubmit={handleSubmit}>
+      <h2 className="text-[13px] uppercase tracking-widest text-brand-950">
+        Shipping Address
       </h2>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="mt-6 grid gap-5 md:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-brand-700">Nama Depan *</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+            First Name *
+          </label>
           <input
             type="text"
             value={form.first_name}
             onChange={(e) => setForm((f) => ({ ...f, first_name: e.target.value }))}
             className="input-field"
-            placeholder="Nama depan"
+            placeholder="First name"
           />
-          {errors.first_name && <p className="mt-1 text-xs text-red-600">{errors.first_name}</p>}
+          {errors.first_name && <p className="mt-1 text-xs text-red-500">{errors.first_name}</p>}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-brand-700">Nama Belakang</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+            Last Name
+          </label>
           <input
             type="text"
             value={form.last_name}
             onChange={(e) => setForm((f) => ({ ...f, last_name: e.target.value }))}
             className="input-field"
-            placeholder="Nama belakang"
+            placeholder="Last name"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1.5 block text-sm font-medium text-brand-700">No. HP (WhatsApp) *</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+            Phone (WhatsApp) *
+          </label>
           <input
             type="tel"
             value={form.phone}
@@ -136,70 +142,78 @@ export default function ShippingForm({
             className="input-field"
             placeholder="08xxxxxxxxxx"
           />
-          {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
+          {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1.5 block text-sm font-medium text-brand-700">Alamat Lengkap *</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+            Full Address *
+          </label>
           <textarea
             value={form.address_1}
             onChange={(e) => setForm((f) => ({ ...f, address_1: e.target.value }))}
             rows={3}
             className="input-field"
-            placeholder="Nama jalan, no. rumah, RT/RW, kelurahan, kecamatan"
+            placeholder="Street, house number, RT/RW, kelurahan, kecamatan"
           />
-          {errors.address_1 && <p className="mt-1 text-xs text-red-600">{errors.address_1}</p>}
+          {errors.address_1 && <p className="mt-1 text-xs text-red-500">{errors.address_1}</p>}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-brand-700">Provinsi *</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+            Province *
+          </label>
           <select
             value={form.province_id}
             onChange={(e) => handleProvinceChange(e.target.value)}
             className="input-field"
           >
-            <option value="">Pilih Provinsi</option>
+            <option value="">Select Province</option>
             {provinces.map((p) => (
               <option key={p.province_id} value={p.province_id}>
                 {p.province}
               </option>
             ))}
           </select>
-          {errors.province && <p className="mt-1 text-xs text-red-600">{errors.province}</p>}
+          {errors.province && <p className="mt-1 text-xs text-red-500">{errors.province}</p>}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-brand-700">Kota / Kabupaten *</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+            City *
+          </label>
           <select
             value={form.city_id}
             onChange={(e) => handleCityChange(e.target.value)}
             disabled={!form.province_id || loadingCities}
-            className="input-field disabled:bg-brand-50"
+            className="input-field disabled:opacity-30"
           >
-            <option value="">{loadingCities ? 'Memuat...' : 'Pilih Kota'}</option>
+            <option value="">{loadingCities ? 'Loading...' : 'Select City'}</option>
             {cities.map((c) => (
               <option key={c.city_id} value={c.city_id}>
                 {c.type} {c.city_name}
               </option>
             ))}
           </select>
-          {errors.city && <p className="mt-1 text-xs text-red-600">{errors.city}</p>}
+          {errors.city && <p className="mt-1 text-xs text-red-500">{errors.city}</p>}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-brand-700">Kode Pos</label>
+          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+            Postal Code
+          </label>
           <input
             type="text"
             value={form.postal_code}
             onChange={(e) => setForm((f) => ({ ...f, postal_code: e.target.value }))}
             className="input-field"
-            placeholder="Kode pos"
+            placeholder="Postal code"
           />
         </div>
       </div>
 
       <button type="submit" className="btn-primary mt-8 w-full py-4">
-        LANJUT PILIH PENGIRIMAN
+        Continue to Shipping
       </button>
     </form>
   )
