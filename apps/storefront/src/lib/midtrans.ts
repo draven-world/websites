@@ -17,6 +17,7 @@ type TransactionParams = {
     price: number
     quantity: number
   }>
+  custom_field1?: string
 }
 
 export async function createSnapTransaction(params: TransactionParams) {
@@ -29,10 +30,11 @@ export async function createSnapTransaction(params: TransactionParams) {
     },
     customer_details: {
       first_name: params.customer_name,
-      email: params.customer_email || '',
+      ...(params.customer_email ? { email: params.customer_email } : {}),
       phone: params.customer_phone,
     },
     item_details: params.items,
+    ...(params.custom_field1 ? { custom_field1: params.custom_field1 } : {}),
     callbacks: {
       finish: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/order/success`,
     },
@@ -54,6 +56,29 @@ export async function createSnapTransaction(params: TransactionParams) {
   }
 
   return res.json() as Promise<{ token: string; redirect_url: string }>
+}
+
+export async function getTransactionStatus(orderId: string) {
+  const auth = Buffer.from(`${MIDTRANS_SERVER_KEY}:`).toString('base64')
+  const apiBase = IS_PRODUCTION
+    ? 'https://api.midtrans.com/v2'
+    : 'https://api.sandbox.midtrans.com/v2'
+
+  const res = await fetch(`${apiBase}/${orderId}/status`, {
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Basic ${auth}`,
+    },
+  })
+
+  if (!res.ok) return null
+  return res.json() as Promise<{
+    transaction_status: string
+    fraud_status?: string
+    order_id: string
+    gross_amount: string
+    payment_type?: string
+  }>
 }
 
 export function verifySignature(

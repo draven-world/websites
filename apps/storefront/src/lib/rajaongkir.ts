@@ -1,56 +1,71 @@
 const API_KEY = process.env.RAJAONGKIR_API_KEY || ''
-const BASE_URL = 'https://api.rajaongkir.com/starter'
+const BASE_URL = 'https://rajaongkir.komerce.id/api/v1'
 
 type Province = {
-  province_id: string
-  province: string
+  id: number
+  name: string
 }
 
 type City = {
-  city_id: string
-  province_id: string
-  province: string
-  type: string
-  city_name: string
-  postal_code: string
+  id: number
+  name: string
+  zip_code: string
 }
 
-type CostService = {
+type District = {
+  id: number
+  name: string
+  zip_code: string
+}
+
+type CostResult = {
+  name: string
+  code: string
   service: string
   description: string
-  cost: Array<{ value: number; etd: string; note: string }>
+  cost: number
+  etd: string
 }
 
-// Cache provinces in memory (rarely changes)
 let provincesCache: Province[] | null = null
 
 export async function getProvinces(): Promise<Province[]> {
   if (provincesCache) return provincesCache
 
-  const res = await fetch(`${BASE_URL}/province`, {
+  const res = await fetch(`${BASE_URL}/destination/province`, {
     headers: { key: API_KEY },
   })
 
-  if (!res.ok) throw new Error('Gagal memuat data provinsi')
+  if (!res.ok) throw new Error('Failed to load provinces')
 
   const data = await res.json()
-  provincesCache = data.rajaongkir.results as Province[]
+  if (data.meta?.status !== 'success') throw new Error(data.meta?.message || 'API error')
+  provincesCache = data.data as Province[]
   return provincesCache
 }
 
-export async function getCities(provinceId?: string): Promise<City[]> {
-  const url = provinceId
-    ? `${BASE_URL}/city?province=${provinceId}`
-    : `${BASE_URL}/city`
-
-  const res = await fetch(url, {
+export async function getCities(provinceId: string): Promise<City[]> {
+  const res = await fetch(`${BASE_URL}/destination/city/${provinceId}`, {
     headers: { key: API_KEY },
   })
 
-  if (!res.ok) throw new Error('Gagal memuat data kota')
+  if (!res.ok) throw new Error('Failed to load cities')
 
   const data = await res.json()
-  return data.rajaongkir.results as City[]
+  if (data.meta?.status !== 'success') throw new Error(data.meta?.message || 'API error')
+  return data.data as City[]
+}
+
+export async function getDistricts(cityId: string): Promise<District[]> {
+  const res = await fetch(`${BASE_URL}/destination/district/${cityId}`, {
+    headers: { key: API_KEY },
+  })
+
+  if (!res.ok) throw new Error('Failed to load districts')
+
+  const data = await res.json()
+  if (data.meta?.status !== 'success') throw new Error(data.meta?.message || 'API error')
+  return data.data as District[]
 }
 
 export async function getShippingCost(
@@ -58,8 +73,8 @@ export async function getShippingCost(
   destination: string,
   weight: number,
   courier: string,
-): Promise<CostService[]> {
-  const res = await fetch(`${BASE_URL}/cost`, {
+): Promise<CostResult[]> {
+  const res = await fetch(`${BASE_URL}/calculate/district/domestic-cost`, {
     method: 'POST',
     headers: {
       key: API_KEY,
@@ -70,15 +85,13 @@ export async function getShippingCost(
       destination,
       weight: String(weight),
       courier,
+      price: 'lowest',
     }),
   })
 
-  if (!res.ok) throw new Error('Gagal menghitung ongkos kirim')
+  if (!res.ok) throw new Error('Failed to calculate shipping cost')
 
   const data = await res.json()
-  const results = data.rajaongkir.results
-  if (results?.[0]?.costs) {
-    return results[0].costs as CostService[]
-  }
-  return []
+  if (data.meta?.status !== 'success') throw new Error(data.meta?.message || 'API error')
+  return (data.data || []) as CostResult[]
 }

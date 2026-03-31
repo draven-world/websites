@@ -15,6 +15,8 @@ export type ShippingAddress = {
   address_1: string
   city: string
   city_id: string
+  district: string
+  district_id: string
   province: string
   province_id: string
   postal_code: string
@@ -113,6 +115,7 @@ export default function CheckoutPage() {
           {step === 'delivery' && address && (
             <ShippingOptions
               address={address}
+              destinationId={address.district_id}
               cartWeight={cart.items.reduce(
                 (sum, item) => sum + 200 * item.quantity,
                 0,

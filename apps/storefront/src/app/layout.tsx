@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Script
             src={MIDTRANS_SNAP_URL}
             data-client-key={MIDTRANS_CLIENT_KEY}
-            strategy="lazyOnload"
+            strategy="afterInteractive"
           />
         )}
       </body>

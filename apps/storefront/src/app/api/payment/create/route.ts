@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
           quantity: 1,
         },
       ],
+      custom_field1: `${customer_name}|${customer_phone}`,
     })
 
     // Send WhatsApp notification (fire-and-forget)

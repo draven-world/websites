@@ -4,87 +4,70 @@ import { useState, useEffect } from 'react'
 import { formatRupiah } from '@/lib/utils'
 import type { ShippingAddress, ShippingCost } from '@/app/(store)/checkout/page'
 
-const couriers = [
-  { id: 'jne', name: 'JNE' },
-  { id: 'tiki', name: 'TIKI' },
-  { id: 'pos', name: 'POS Indonesia' },
-]
-
-type CostResult = {
+type CostOption = {
+  name: string
+  code: string
   service: string
   description: string
-  cost: Array<{ value: number; etd: string; note: string }>
+  cost: number
+  etd: string
 }
 
 export default function ShippingOptions({
   address,
+  destinationId,
   cartWeight,
   onSelect,
   onBack,
 }: {
   address: ShippingAddress
+  destinationId: string
   cartWeight: number
   onSelect: (cost: ShippingCost) => void
   onBack: () => void
 }) {
   const [loading, setLoading] = useState(false)
-  const [results, setResults] = useState<Map<string, CostResult[]>>(new Map())
+  const [options, setOptions] = useState<CostOption[]>([])
   const [selected, setSelected] = useState<ShippingCost | null>(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    loadAllCouriers()
+    loadShippingCosts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function loadAllCouriers() {
+  async function loadShippingCosts() {
     setLoading(true)
-    const allResults = new Map<string, CostResult[]>()
+    setError('')
 
-    for (const courier of couriers) {
-      try {
-        const res = await fetch('/api/shipping/cost', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            destination: address.city_id,
-            weight: Math.max(cartWeight, 100),
-            courier: courier.id,
-          }),
-        })
-        const data = await res.json()
-        if (data.costs?.length > 0) {
-          allResults.set(courier.id, data.costs)
-        }
-      } catch {
-        // Skip failed courier
+    try {
+      const res = await fetch('/api/shipping/cost', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destination: destinationId,
+          weight: Math.max(cartWeight, 100),
+          courier: 'jne:tiki:pos:sicepat:jnt:anteraja',
+        }),
+      })
+      const data = await res.json()
+
+      if (data.costs && data.costs.length > 0) {
+        const sorted = [...data.costs].sort((a: CostOption, b: CostOption) => a.cost - b.cost)
+        setOptions(sorted)
+      } else {
+        setError(data.error || 'No shipping options available')
       }
+    } catch {
+      setError('Failed to load shipping options')
+    } finally {
+      setLoading(false)
     }
-
-    setResults(allResults)
-    setLoading(false)
   }
 
   function handleSubmit() {
     if (selected) onSelect(selected)
   }
-
-  const allOptions: ShippingCost[] = []
-  results.forEach((costs, courierId) => {
-    const courierName = couriers.find((c) => c.id === courierId)?.name || courierId
-    costs.forEach((c) => {
-      if (c.cost[0]) {
-        allOptions.push({
-          courier: courierName,
-          service: c.service,
-          description: c.description,
-          cost: c.cost[0].value,
-          etd: c.cost[0].etd,
-        })
-      }
-    })
-  })
-
-  allOptions.sort((a, b) => a.cost - b.cost)
 
   return (
     <div>
@@ -92,7 +75,7 @@ export default function ShippingOptions({
         Select Shipping
       </h2>
       <p className="mt-2 text-sm text-brand-400">
-        Deliver to: {address.city}, {address.province}
+        Deliver to: {address.district}, {address.city}, {address.province}
       </p>
 
       {loading ? (
@@ -100,15 +83,21 @@ export default function ShippingOptions({
           <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
           <span className="ml-3 text-sm text-brand-400">Checking rates...</span>
         </div>
-      ) : allOptions.length > 0 ? (
+      ) : options.length > 0 ? (
         <div className="mt-6 space-y-2">
-          {allOptions.map((opt) => {
-            const key = `${opt.courier}-${opt.service}`
+          {options.map((opt) => {
+            const key = `${opt.code}-${opt.service}`
             const isSelected = selected && `${selected.courier}-${selected.service}` === key
             return (
               <button
                 key={key}
-                onClick={() => setSelected(opt)}
+                onClick={() => setSelected({
+                  courier: opt.code,
+                  service: opt.service,
+                  description: `${opt.name} — ${opt.description}`,
+                  cost: opt.cost,
+                  etd: opt.etd,
+                })}
                 className={`flex w-full items-center justify-between p-4 text-left transition-colors ${
                   isSelected
                     ? 'border border-brand-950 bg-brand-50'
@@ -117,10 +106,10 @@ export default function ShippingOptions({
               >
                 <div>
                   <p className="text-sm text-brand-950">
-                    {opt.courier} — {opt.service}
+                    {opt.name} — {opt.service}
                   </p>
                   <p className="mt-0.5 text-xs text-brand-400">
-                    {opt.description} · Est. {opt.etd} days
+                    {opt.description} · Est. {opt.etd}
                   </p>
                 </div>
                 <p className="text-sm text-brand-950">{formatRupiah(opt.cost)}</p>
@@ -130,7 +119,7 @@ export default function ShippingOptions({
         </div>
       ) : (
         <div className="mt-6 py-12 text-center text-sm text-brand-400">
-          No shipping options available. Try a different address.
+          {error || 'No shipping options available. Try a different address.'}
         </div>
       )}
 

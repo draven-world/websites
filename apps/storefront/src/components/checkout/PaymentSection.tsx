@@ -13,6 +13,126 @@ type Cart = {
   total: number
 }
 
+const LAST_ORDER_KEY = 'draven_last_order'
+
+const paymentMethods = [
+  {
+    name: 'QRIS',
+    desc: 'Scan & pay instantly',
+    featured: true,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
+        <rect x="2" y="2" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="14" y="2" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="2" y="14" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
+        <rect x="15" y="15" width="2" height="2" fill="currentColor" />
+        <rect x="19" y="15" width="2" height="2" fill="currentColor" />
+        <rect x="15" y="19" width="2" height="2" fill="currentColor" />
+        <rect x="19" y="19" width="2" height="2" fill="currentColor" />
+        <rect x="17" y="17" width="2" height="2" fill="currentColor" />
+        <rect x="5" y="5" width="2" height="2" fill="currentColor" />
+        <rect x="17" y="5" width="2" height="2" fill="currentColor" />
+        <rect x="5" y="17" width="2" height="2" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    name: 'GoPay',
+    desc: 'E-wallet',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    name: 'ShopeePay',
+    desc: 'E-wallet',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <rect x="5" y="7" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M9 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="12" cy="14" r="2" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    ),
+  },
+  {
+    name: 'BCA VA',
+    desc: 'Virtual Account',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    name: 'BNI VA',
+    desc: 'Virtual Account',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Mandiri VA',
+    desc: 'Virtual Account',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Indomaret',
+    desc: 'Convenience store',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <rect x="9" y="13" width="6" height="8" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M12 13v8" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Alfamart',
+    desc: 'Convenience store',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
+        <path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <rect x="9" y="13" width="6" height="8" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M12 13v8" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    ),
+  },
+]
+
+function waitForSnap(timeout = 10000): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window !== 'undefined' && (window as any).snap) {
+      resolve(true)
+      return
+    }
+    const start = Date.now()
+    const interval = setInterval(() => {
+      if ((window as any).snap) {
+        clearInterval(interval)
+        resolve(true)
+      } else if (Date.now() - start > timeout) {
+        clearInterval(interval)
+        resolve(false)
+      }
+    }, 200)
+  })
+}
+
 export default function PaymentSection({
   cart,
   address,
@@ -36,6 +156,15 @@ export default function PaymentSection({
     setError('')
 
     try {
+      // 1. Wait for Midtrans Snap to load
+      const snapReady = await waitForSnap()
+      if (!snapReady) {
+        setError('Payment gateway not loaded. Please refresh the page.')
+        setLoading(false)
+        return
+      }
+
+      // 2. Create transaction on server
       const orderId = `DRV-${Date.now()}`
 
       const items = cart.items.map((item) => ({
@@ -70,76 +199,83 @@ export default function PaymentSection({
         throw new Error(data.error || 'Failed to create transaction')
       }
 
-      if (typeof window !== 'undefined' && (window as any).snap) {
-        ;(window as any).snap.pay(data.token, {
-          onSuccess: () => {
-            if (user) {
-              addOrder({
-                items: cart.items.map((item) => ({
-                  title: item.title,
-                  variant: item.variant,
-                  quantity: item.quantity,
-                  price: item.price,
-                  thumbnail: item.thumbnail,
-                })),
-                subtotal: cart.subtotal,
-                shipping_cost: shippingCost.cost,
-                total: grandTotal,
-                shipping_address: {
-                  name: `${address.first_name} ${address.last_name}`.trim(),
-                  address: address.address_1,
-                  city: address.city,
-                  province: address.province,
-                  phone: address.phone,
-                },
-                shipping_method: `${shippingCost.courier} ${shippingCost.service}`,
-                status: 'paid',
-              })
-            }
-            clearCart()
-            window.location.href = '/order/success'
+      // 3. Save order BEFORE opening Snap (so it persists even if browser closes)
+      if (user) {
+        addOrder({
+          items: cart.items.map((item) => ({
+            title: item.title,
+            variant: item.variant,
+            quantity: item.quantity,
+            price: item.price,
+            thumbnail: item.thumbnail,
+          })),
+          subtotal: cart.subtotal,
+          shipping_cost: shippingCost.cost,
+          total: grandTotal,
+          shipping_address: {
+            name: `${address.first_name} ${address.last_name}`.trim(),
+            address: address.address_1,
+            city: address.city,
+            province: address.province,
+            phone: address.phone,
           },
-          onPending: () => {
-            if (user) {
-              addOrder({
-                items: cart.items.map((item) => ({
-                  title: item.title,
-                  variant: item.variant,
-                  quantity: item.quantity,
-                  price: item.price,
-                  thumbnail: item.thumbnail,
-                })),
-                subtotal: cart.subtotal,
-                shipping_cost: shippingCost.cost,
-                total: grandTotal,
-                shipping_address: {
-                  name: `${address.first_name} ${address.last_name}`.trim(),
-                  address: address.address_1,
-                  city: address.city,
-                  province: address.province,
-                  phone: address.phone,
-                },
-                shipping_method: `${shippingCost.courier} ${shippingCost.service}`,
-                status: 'pending',
-              })
-            }
-            window.location.href = '/order/pending'
-          },
-          onError: () => {
-            setError('Payment failed. Please try again.')
-          },
-          onClose: () => {
-            setError('Payment window closed. Try again if you haven\'t paid.')
-          },
+          shipping_method: `${shippingCost.courier} ${shippingCost.service}`,
+          status: 'pending',
         })
-      } else {
-        setError('Payment gateway not loaded. Refresh the page and try again.')
       }
+
+      // 4. Store last order ID for success/pending pages
+      localStorage.setItem(LAST_ORDER_KEY, orderId)
+
+      // 5. Clear cart (order is already saved)
+      clearCart()
+
+      // 6. Open Snap popup
+      ;(window as any).snap.pay(data.token, {
+        onSuccess: () => {
+          // Update order status to paid
+          if (user) {
+            updateLastOrderStatus('paid')
+          }
+          window.location.href = `/order/success?id=${orderId}`
+        },
+        onPending: () => {
+          window.location.href = `/order/pending?id=${orderId}`
+        },
+        onError: () => {
+          // Update order status to failed
+          if (user) {
+            updateLastOrderStatus('processing')
+          }
+          setError('Payment failed. Check your order status in Account > Orders.')
+        },
+        onClose: () => {
+          // User closed popup — payment may or may not have been completed
+          setError('Payment window closed. Check your order status in Account > Orders, or try again from your orders page.')
+        },
+      })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong'
       setError(message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  function updateLastOrderStatus(status: 'paid' | 'pending' | 'processing') {
+    if (!user) return
+    // Get orders from localStorage and update the most recent one
+    const key = `draven_orders_${user.id}`
+    try {
+      const raw = localStorage.getItem(key)
+      if (!raw) return
+      const orders = JSON.parse(raw)
+      if (orders.length > 0) {
+        orders[0].status = status
+        localStorage.setItem(key, JSON.stringify(orders))
+      }
+    } catch {
+      // Ignore
     }
   }
 
@@ -155,28 +291,54 @@ export default function PaymentSection({
         <div className="mt-2 text-sm text-brand-500">
           <p>{address.first_name} {address.last_name}</p>
           <p>{address.address_1}</p>
-          <p>{address.city}, {address.province} {address.postal_code}</p>
+          <p>{address.district}, {address.city}, {address.province} {address.postal_code}</p>
           <p>{address.phone}</p>
         </div>
 
         <div className="mt-4 text-sm text-brand-500">
-          <p>{shippingCost.courier} — {shippingCost.service} · {formatRupiah(shippingCost.cost)}</p>
-          <p className="text-xs text-brand-400">Est. {shippingCost.etd} days</p>
+          <p>{shippingCost.description} · {formatRupiah(shippingCost.cost)}</p>
+          <p className="text-xs text-brand-400">Est. {shippingCost.etd}</p>
         </div>
       </div>
 
       {/* Payment Methods */}
       <div className="mt-8 border-t border-brand-200 pt-6">
-        <p className="text-[11px] uppercase tracking-widest text-brand-400">Available Methods</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {['QRIS', 'GoPay', 'ShopeePay', 'BCA VA', 'BNI VA', 'Mandiri VA', 'OVO', 'DANA', 'Indomaret'].map((m) => (
-            <span key={m} className="border border-brand-200 px-3 py-1.5 text-[11px] tracking-wider text-brand-400">
-              {m}
+        <p className="text-[11px] uppercase tracking-widest text-brand-400">Available Payment Methods</p>
+
+        {/* QRIS — Featured */}
+        <div className="mt-4 border border-brand-950 bg-brand-50 p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center bg-brand-950 text-white">
+              {paymentMethods[0].icon}
+            </div>
+            <div>
+              <p className="text-sm font-medium text-brand-950">QRIS</p>
+              <p className="text-xs text-brand-400">Scan QR — GoPay, OVO, DANA, ShopeePay, Bank apps</p>
+            </div>
+            <span className="ml-auto text-[9px] uppercase tracking-widest text-brand-950 border border-brand-950 px-2 py-0.5">
+              Recommended
             </span>
+          </div>
+        </div>
+
+        {/* Other Methods */}
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {paymentMethods.slice(1).map((m) => (
+            <div
+              key={m.name}
+              className="flex items-center gap-2 border border-brand-100 p-3"
+            >
+              <span className="text-brand-400">{m.icon}</span>
+              <div className="min-w-0">
+                <p className="truncate text-xs font-medium text-brand-950">{m.name}</p>
+                <p className="text-[10px] text-brand-400">{m.desc}</p>
+              </div>
+            </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-brand-400">
-          Select payment method after clicking &quot;Pay Now&quot;
+
+        <p className="mt-4 text-xs text-brand-400">
+          You&apos;ll choose your payment method in the secure payment window after clicking &quot;Pay Now&quot;
         </p>
       </div>
 

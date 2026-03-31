@@ -1,10 +1,13 @@
+'use client'
+
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Suspense } from 'react'
 
-export const metadata = {
-  title: 'Order Confirmed',
-}
+function SuccessContent() {
+  const searchParams = useSearchParams()
+  const orderId = searchParams.get('id')
 
-export default function OrderSuccessPage() {
   return (
     <div className="mx-auto max-w-md px-5 py-32 text-center">
       <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center bg-brand-950">
@@ -16,6 +19,11 @@ export default function OrderSuccessPage() {
       <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
         Order Confirmed
       </h1>
+
+      {orderId && (
+        <p className="mt-3 font-mono text-sm text-brand-400">{orderId}</p>
+      )}
+
       <p className="mt-4 text-sm leading-relaxed text-brand-400">
         Thank you for shopping with DRAVEN. Your payment has been confirmed and we&apos;re processing your order.
       </p>
@@ -28,12 +36,24 @@ export default function OrderSuccessPage() {
           Continue Shopping
         </Link>
         <Link
-          href="/"
+          href="/account/orders"
           className="text-[11px] uppercase tracking-widest text-brand-400 transition-colors hover:text-brand-950"
         >
-          Back to Home
+          View Orders
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
+      </div>
+    }>
+      <SuccessContent />
+    </Suspense>
   )
 }
