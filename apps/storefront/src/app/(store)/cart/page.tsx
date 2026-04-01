@@ -3,10 +3,12 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useCart } from '@/providers/cart-provider'
+import { useToast } from '@/providers/toast-provider'
 import { formatRupiah } from '@/lib/utils'
 
 export default function CartPage() {
   const { cart, loading, totalItems, updateQuantity, removeItem } = useCart()
+  const { toast } = useToast()
 
   if (loading) {
     return (
@@ -73,13 +75,15 @@ export default function CartPage() {
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1}
+                        aria-label={`Decrease quantity of ${item.title}`}
                         className="px-3 py-1.5 text-sm text-brand-400 transition-colors hover:text-brand-950 disabled:opacity-20"
                       >
                         −
                       </button>
-                      <span className="min-w-[2rem] text-center text-sm">{item.quantity}</span>
+                      <span className="min-w-[2rem] text-center text-sm" aria-label={`Quantity: ${item.quantity}`}>{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        aria-label={`Increase quantity of ${item.title}`}
                         className="px-3 py-1.5 text-sm text-brand-400 transition-colors hover:text-brand-950"
                       >
                         +
@@ -87,7 +91,10 @@ export default function CartPage() {
                     </div>
 
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => {
+                        removeItem(item.id)
+                        toast(`${item.title} removed from bag`)
+                      }}
                       className="text-[11px] uppercase tracking-widest text-brand-400 transition-colors hover:text-brand-950"
                     >
                       Remove

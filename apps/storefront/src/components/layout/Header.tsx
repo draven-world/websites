@@ -2,16 +2,61 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useCart } from '@/providers/cart-provider'
 import { useAuth } from '@/providers/auth-provider'
+import { formatRupiah } from '@/lib/utils'
+
+type SearchResult = {
+  id: string
+  title: string
+  handle: string
+  thumbnail: string | null
+  variants: Array<{ prices: Array<{ amount: number }> }>
+}
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [results, setResults] = useState<SearchResult[]>([])
+  const [searching, setSearching] = useState(false)
+  const [searched, setSearched] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const { totalItems } = useCart()
   const { user } = useAuth()
+
+  const doSearch = useCallback(async (q: string) => {
+    if (!q.trim()) {
+      setResults([])
+      setSearched(false)
+      setSearching(false)
+      return
+    }
+    setSearching(true)
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`)
+      const data = await res.json()
+      setResults(data)
+      setSearched(true)
+    } catch {
+      setResults([])
+      setSearched(true)
+    } finally {
+      setSearching(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (!searchQuery.trim()) {
+      setResults([])
+      setSearched(false)
+      return
+    }
+    debounceRef.current = setTimeout(() => doSearch(searchQuery), 300)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [searchQuery, doSearch])
 
   return (
     <>
@@ -91,7 +136,11 @@ export default function Header() {
       {searchOpen && (
         <div className="fixed inset-0 z-50 bg-white">
           <div className="flex h-14 items-center justify-end px-5">
-            <button onClick={() => { setSearchOpen(false); setSearchQuery('') }} className="text-brand-950">
+            <button
+              onClick={() => { setSearchOpen(false); setSearchQuery(''); setResults([]); setSearched(false) }}
+              className="text-brand-950"
+              aria-label="Close search"
+            >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -104,7 +153,9 @@ export default function Header() {
                 if (searchQuery.trim()) window.location.href = `/products?q=${encodeURIComponent(searchQuery)}`
               }}
             >
+              <label htmlFor="search-input" className="sr-only">Search products</label>
               <input
+                id="search-input"
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -113,6 +164,65 @@ export default function Header() {
                 autoFocus
               />
             </form>
+
+            {/* Live results */}
+            <div className="mt-6">
+              {searching && (
+                <div className="flex items-center gap-2 py-4">
+                  <div className="h-4 w-4 animate-spin border-2 border-brand-950 border-t-transparent" />
+                  <span className="text-sm text-brand-400">Searching...</span>
+                </div>
+              )}
+
+              {!searching && searched && results.length === 0 && (
+                <p className="py-4 text-sm text-brand-400">
+                  No results found for &ldquo;{searchQuery}&rdquo;
+                </p>
+              )}
+
+              {!searching && results.length > 0 && (
+                <>
+                  <p className="text-[11px] uppercase tracking-widest text-brand-400">
+                    {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{searchQuery}&rdquo;
+                  </p>
+                  <div className="mt-4 divide-y divide-brand-100">
+                    {results.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`/products/${item.handle}`}
+                        onClick={() => { setSearchOpen(false); setSearchQuery(''); setResults([]); setSearched(false) }}
+                        className="flex items-center gap-4 py-3 transition-opacity hover:opacity-60"
+                      >
+                        <div className="relative h-14 w-11 flex-shrink-0 overflow-hidden bg-brand-50">
+                          {item.thumbnail ? (
+                            <Image src={item.thumbnail} alt={item.title} fill className="object-cover" sizes="44px" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <span className="text-[7px] uppercase tracking-widest text-brand-300">No img</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="truncate text-sm font-medium text-brand-950">{item.title}</p>
+                          <p className="text-xs text-brand-400">
+                            {item.variants?.[0]?.prices?.[0]
+                              ? formatRupiah(item.variants[0].prices[0].amount)
+                              : ''}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link
+                    href={`/products?q=${encodeURIComponent(searchQuery)}`}
+                    onClick={() => { setSearchOpen(false); setSearchQuery(''); setResults([]); setSearched(false) }}
+                    className="mt-4 block text-center text-[11px] uppercase tracking-widest text-brand-400 transition-colors hover:text-brand-950"
+                  >
+                    View all results
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}

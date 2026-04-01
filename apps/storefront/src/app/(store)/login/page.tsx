@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({})
   const { login, user } = useAuth()
   const router = useRouter()
 
@@ -48,10 +49,18 @@ export default function LoginPage() {
           <input
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="input-field"
+            onChange={(e) => {
+              setEmail(e.target.value)
+              if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined }))
+            }}
+            onBlur={() => {
+              if (email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+                setFieldErrors((f) => ({ ...f, email: 'Format email tidak valid' }))
+            }}
+            className={`input-field ${fieldErrors.email ? 'border-red-500' : email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? 'border-green-500' : ''}`}
             placeholder="your@email.com"
           />
+          {fieldErrors.email && <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>}
         </div>
 
         <div>

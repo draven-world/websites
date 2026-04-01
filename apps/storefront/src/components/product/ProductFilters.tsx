@@ -41,6 +41,7 @@ export default function ProductFilters() {
           <button
             key={cat.value}
             onClick={() => updateParam('category', cat.value)}
+            aria-current={currentCategory === cat.value ? 'page' : undefined}
             className={`block text-sm transition-opacity ${
               currentCategory === cat.value
                 ? 'text-brand-950'
@@ -74,6 +75,7 @@ export function SortDropdown() {
     <select
       value={currentSort}
       onChange={(e) => handleSort(e.target.value)}
+      aria-label="Sort products"
       className="border-0 bg-transparent text-sm text-brand-400 outline-none focus:text-brand-950"
     >
       {sortOptions.map((opt) => (

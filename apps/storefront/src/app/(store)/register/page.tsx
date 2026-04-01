@@ -14,8 +14,23 @@ export default function RegisterPage() {
     password: '',
   })
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const { register, user } = useAuth()
   const router = useRouter()
+
+  function validateEmail(v: string) {
+    if (!v.trim()) return 'Required'
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Format email tidak valid'
+    return null
+  }
+  function validatePhone(v: string) {
+    if (!v.trim()) return null // optional
+    if (!/^08\d{8,11}$/.test(v.replace(/\s/g, ''))) return 'Format: 08xxxxxxxxxx'
+    return null
+  }
+  function clearFieldError(field: string) {
+    setFieldErrors((prev) => { const n = { ...prev }; delete n[field]; return n })
+  }
 
   if (user) {
     router.replace('/account')
@@ -85,23 +100,28 @@ export default function RegisterPage() {
           <input
             type="email"
             value={form.email}
-            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-            className="input-field"
+            onChange={(e) => { setForm((f) => ({ ...f, email: e.target.value })); if (fieldErrors.email) clearFieldError('email') }}
+            onBlur={() => { const err = validateEmail(form.email); if (err) setFieldErrors((p) => ({ ...p, email: err })) }}
+            className={`input-field ${fieldErrors.email ? 'border-red-500' : form.email && !validateEmail(form.email) ? 'border-green-500' : ''}`}
             placeholder="your@email.com"
           />
+          {fieldErrors.email && <p className="mt-1 text-xs text-red-500">{fieldErrors.email}</p>}
         </div>
 
         <div>
           <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
-            Phone (WhatsApp)
+            Phone (WhatsApp) — optional
           </label>
           <input
             type="tel"
             value={form.phone}
-            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-            className="input-field"
+            onChange={(e) => { setForm((f) => ({ ...f, phone: e.target.value })); if (fieldErrors.phone) clearFieldError('phone') }}
+            onBlur={() => { const err = validatePhone(form.phone); if (err) setFieldErrors((p) => ({ ...p, phone: err })) }}
+            className={`input-field ${fieldErrors.phone ? 'border-red-500' : form.phone && !validatePhone(form.phone) ? 'border-green-500' : ''}`}
             placeholder="08xxxxxxxxxx"
           />
+          <p className="mt-1 text-[10px] text-brand-300">Format: 08xxxxxxxxxx</p>
+          {fieldErrors.phone && <p className="mt-0.5 text-xs text-red-500">{fieldErrors.phone}</p>}
         </div>
 
         <div>
@@ -111,10 +131,13 @@ export default function RegisterPage() {
           <input
             type="password"
             value={form.password}
-            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-            className="input-field"
+            onChange={(e) => { setForm((f) => ({ ...f, password: e.target.value })); if (fieldErrors.password) clearFieldError('password') }}
+            onBlur={() => { if (form.password && form.password.length < 6) setFieldErrors((p) => ({ ...p, password: 'Min. 6 karakter' })) }}
+            className={`input-field ${fieldErrors.password ? 'border-red-500' : form.password.length >= 6 ? 'border-green-500' : ''}`}
             placeholder="Min. 6 characters"
           />
+          <p className="mt-1 text-[10px] text-brand-300">Min. 6 karakter</p>
+          {fieldErrors.password && <p className="mt-0.5 text-xs text-red-500">{fieldErrors.password}</p>}
         </div>
 
         {error && (

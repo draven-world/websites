@@ -33,7 +33,10 @@ export default function MobileNav() {
                 <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
               </svg>
               {item.badge && totalItems > 0 && (
-                <span className="absolute right-3 top-0 flex h-3.5 w-3.5 items-center justify-center bg-brand-950 text-[7px] font-bold text-white">
+                <span
+                  className="absolute right-3 top-0 flex h-3.5 w-3.5 items-center justify-center bg-brand-950 text-[7px] font-bold text-white"
+                  aria-label={`${totalItems} item${totalItems !== 1 ? 's' : ''} in bag`}
+                >
                   {totalItems}
                 </span>
               )}

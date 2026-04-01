@@ -8,7 +8,7 @@ type Props = {
 }
 
 // Exclude routes yang sudah ada
-const RESERVED_SLUGS = ['products', 'cart', 'checkout', 'order', 'faq', 'account']
+const RESERVED_SLUGS = ['products', 'cart', 'checkout', 'order', 'faq', 'account', 'cara-order', 'kebijakan-privasi', 'login', 'register']
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (RESERVED_SLUGS.includes(params.slug)) return {}

@@ -239,6 +239,19 @@ export async function getSanityProducts() {
   }
 }
 
+export async function searchSanityProducts(query: string, limit = 6) {
+  if (!client || !query.trim()) return []
+  try {
+    const products: SanityProduct[] = await client.fetch(
+      `*[_type == "product" && status == "active" && (title match $q || tags[] match $q)] | order(_createdAt desc) [0...$limit] { ${productFields} }`,
+      { q: `${query}*`, limit },
+    )
+    return products.map(transformProduct)
+  } catch {
+    return []
+  }
+}
+
 export async function getSanityProduct(handle: string) {
   if (!client) return null
   try {

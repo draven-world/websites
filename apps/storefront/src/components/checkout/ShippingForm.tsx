@@ -1,14 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { formatRupiah } from '@/lib/utils'
 import type { ShippingAddress } from '@/app/(store)/checkout/page'
 
 type Option = { id: number; name: string; zip_code?: string }
+type EstimateResult = { name: string; service: string; cost: number; etd: string }
 
 export default function ShippingForm({
   onSubmit,
+  cartWeight = 500,
 }: {
   onSubmit: (address: ShippingAddress) => void
+  cartWeight?: number
 }) {
   const [provinces, setProvinces] = useState<Option[]>([])
   const [cities, setCities] = useState<Option[]>([])
@@ -31,6 +35,9 @@ export default function ShippingForm({
   })
 
   const [errors, setErrors] = useState<Partial<Record<string, string>>>({})
+  const [showEstimate, setShowEstimate] = useState(false)
+  const [estimateLoading, setEstimateLoading] = useState(false)
+  const [estimates, setEstimates] = useState<EstimateResult[]>([])
 
   useEffect(() => {
     fetch('/api/shipping/provinces')
@@ -101,16 +108,50 @@ export default function ShippingForm({
     }))
   }
 
+  function validatePhone(phone: string): string | null {
+    if (!phone.trim()) return 'Required'
+    if (!/^08\d{8,11}$/.test(phone.replace(/\s/g, ''))) return 'Format: 08xxxxxxxxxx (10-13 digit)'
+    return null
+  }
+
   function validate(): boolean {
     const e: Partial<Record<string, string>> = {}
     if (!form.first_name.trim()) e.first_name = 'Required'
-    if (!form.phone.trim()) e.phone = 'Required'
+    const phoneErr = validatePhone(form.phone)
+    if (phoneErr) e.phone = phoneErr
     if (!form.address_1.trim()) e.address_1 = 'Required'
     if (!form.province_id) e.province = 'Select province'
     if (!form.city_id) e.city = 'Select city'
     if (!form.district_id) e.district = 'Select district'
     setErrors(e)
     return Object.keys(e).length === 0
+  }
+
+  async function handleEstimate() {
+    if (!form.district_id) return
+    setEstimateLoading(true)
+    setShowEstimate(true)
+    setEstimates([])
+    try {
+      const res = await fetch('/api/shipping/cost', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destination: form.district_id,
+          weight: Math.max(cartWeight, 100),
+          courier: 'jne:tiki:sicepat:jnt:anteraja',
+        }),
+      })
+      const data = await res.json()
+      if (data.costs?.length) {
+        const sorted = [...data.costs].sort((a: EstimateResult, b: EstimateResult) => a.cost - b.cost)
+        setEstimates(sorted.slice(0, 5))
+      }
+    } catch {
+      // silent
+    } finally {
+      setEstimateLoading(false)
+    }
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -161,11 +202,24 @@ export default function ShippingForm({
           <input
             type="tel"
             value={form.phone}
-            onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-            className="input-field"
+            onChange={(e) => {
+              setForm((f) => ({ ...f, phone: e.target.value }))
+              if (errors.phone) {
+                const err = validatePhone(e.target.value)
+                setErrors((prev) => err ? { ...prev, phone: err } : (() => { const { phone, ...rest } = prev; return rest })())
+              }
+            }}
+            onBlur={() => {
+              if (form.phone.trim()) {
+                const err = validatePhone(form.phone)
+                if (err) setErrors((prev) => ({ ...prev, phone: err }))
+              }
+            }}
+            className={`input-field ${errors.phone ? 'border-red-500' : form.phone && !validatePhone(form.phone) ? 'border-green-500' : ''}`}
             placeholder="08xxxxxxxxxx"
           />
-          {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
+          <p className="mt-1 text-[10px] text-brand-300">Format: 08xxxxxxxxxx</p>
+          {errors.phone && <p className="mt-0.5 text-xs text-red-500">{errors.phone}</p>}
         </div>
 
         <div className="md:col-span-2">
@@ -254,6 +308,56 @@ export default function ShippingForm({
           />
         </div>
       </div>
+
+      {/* Shipping Cost Estimate */}
+      {form.district_id && (
+        <div className="mt-6">
+          <button
+            type="button"
+            onClick={handleEstimate}
+            className="text-[11px] uppercase tracking-widest text-brand-400 underline underline-offset-4 transition-colors hover:text-brand-950"
+          >
+            Estimasi Ongkir
+          </button>
+
+          {showEstimate && (
+            <div className="mt-4 border border-brand-100 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-[11px] uppercase tracking-widest text-brand-400">
+                  Estimasi ke {form.district}, {form.city}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowEstimate(false)}
+                  className="text-brand-400 hover:text-brand-950"
+                  aria-label="Close estimate"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {estimateLoading ? (
+                <div className="flex items-center gap-2 py-4">
+                  <div className="h-4 w-4 animate-spin border-2 border-brand-950 border-t-transparent" />
+                  <span className="text-xs text-brand-400">Menghitung...</span>
+                </div>
+              ) : estimates.length > 0 ? (
+                <div className="mt-3 space-y-2">
+                  {estimates.map((est, i) => (
+                    <div key={i} className="flex items-center justify-between text-sm">
+                      <span className="text-brand-600">{est.name} {est.service} <span className="text-xs text-brand-300">({est.etd})</span></span>
+                      <span className="font-medium text-brand-950">{formatRupiah(est.cost)}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-3 text-xs text-brand-400">Tidak dapat menghitung ongkir.</p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <button type="submit" className="btn-primary mt-8 w-full py-4">
         Continue to Shipping

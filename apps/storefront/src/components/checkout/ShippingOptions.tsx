@@ -118,8 +118,17 @@ export default function ShippingOptions({
           })}
         </div>
       ) : (
-        <div className="mt-6 py-12 text-center text-sm text-brand-400">
-          {error || 'No shipping options available. Try a different address.'}
+        <div className="mt-6 py-12 text-center">
+          <p className="text-sm text-brand-400">
+            {error || 'No shipping options available. Try a different address.'}
+          </p>
+          <button
+            type="button"
+            onClick={loadShippingCosts}
+            className="mt-4 text-[11px] uppercase tracking-widest text-brand-950 underline underline-offset-4 transition-opacity hover:opacity-60"
+          >
+            Retry
+          </button>
         </div>
       )}
 

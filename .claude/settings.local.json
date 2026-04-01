@@ -46,7 +46,8 @@
       "Bash(curl -s -H \"key: uqzjafBs47b97c17cc49bea2ILLwpAVx\" \"https://rajaongkir.komerce.id/api/v1/destination/city/10\")",
       "Bash(curl -s -H \"key: uqzjafBs47b97c17cc49bea2ILLwpAVx\" \"https://rajaongkir.komerce.id/api/v1/destination/district/136\")",
       "Bash(find 'D:\\\\THE PROJECT\\\\draven\\\\apps\\\\storefront\\\\src\\\\app' -name *order* -o -name *status*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(pnpm exec:*)"
     ]
   }
 }
