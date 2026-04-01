@@ -10,9 +10,9 @@
 
 | Severity | Count | Status |
 |----------|-------|--------|
-| Critical | 6 | Pending |
-| High | 6 | Pending |
-| Medium | 4 | Pending |
+| Critical | 6 | Done |
+| High | 6 | Done |
+| Medium | 4 | Done |
 | Low | 3 | Pending |
 
 ---

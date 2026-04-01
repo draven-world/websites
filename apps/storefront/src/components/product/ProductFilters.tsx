@@ -33,8 +33,55 @@ export default function ProductFilters() {
     router.push(`/products?${params.toString()}`)
   }
 
+  const currentQuery = searchParams.get('q') || ''
+  const hasActiveFilter = !!(currentCategory || currentQuery)
+
+  function clearAll() {
+    router.push('/products')
+  }
+
   return (
     <aside className="w-full">
+      {/* Active Filter Tag */}
+      {hasActiveFilter && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {currentCategory && (
+            <span className="inline-flex items-center gap-1 bg-brand-950 px-2.5 py-1 text-[10px] uppercase tracking-widest text-white">
+              {categories.find((c) => c.value === currentCategory)?.label || currentCategory}
+              <button
+                onClick={() => updateParam('category', '')}
+                className="ml-0.5 hover:opacity-60"
+                aria-label="Remove category filter"
+              >
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+          {currentQuery && (
+            <span className="inline-flex items-center gap-1 bg-brand-950 px-2.5 py-1 text-[10px] uppercase tracking-widest text-white">
+              &ldquo;{currentQuery}&rdquo;
+              <button
+                onClick={() => updateParam('q', '')}
+                className="ml-0.5 hover:opacity-60"
+                aria-label="Remove search filter"
+              >
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </span>
+          )}
+          <button
+            onClick={clearAll}
+            className="text-[10px] uppercase tracking-widest text-brand-400 underline underline-offset-4 hover:text-brand-950"
+          >
+            Clear all
+          </button>
+        </div>
+      )}
+
       {/* Categories */}
       <div className="space-y-2">
         {categories.map((cat) => (

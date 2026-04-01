@@ -15,105 +15,6 @@ type Cart = {
 
 const LAST_ORDER_KEY = 'draven_last_order'
 
-const paymentMethods = [
-  {
-    name: 'QRIS',
-    desc: 'Scan & pay instantly',
-    featured: true,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6">
-        <rect x="2" y="2" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="14" y="2" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="2" y="14" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.5" />
-        <rect x="15" y="15" width="2" height="2" fill="currentColor" />
-        <rect x="19" y="15" width="2" height="2" fill="currentColor" />
-        <rect x="15" y="19" width="2" height="2" fill="currentColor" />
-        <rect x="19" y="19" width="2" height="2" fill="currentColor" />
-        <rect x="17" y="17" width="2" height="2" fill="currentColor" />
-        <rect x="5" y="5" width="2" height="2" fill="currentColor" />
-        <rect x="17" y="5" width="2" height="2" fill="currentColor" />
-        <rect x="5" y="17" width="2" height="2" fill="currentColor" />
-      </svg>
-    ),
-  },
-  {
-    name: 'GoPay',
-    desc: 'E-wallet',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    name: 'ShopeePay',
-    desc: 'E-wallet',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <rect x="5" y="7" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M9 7V5a3 3 0 016 0v2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="12" cy="14" r="2" stroke="currentColor" strokeWidth="1.5" />
-      </svg>
-    ),
-  },
-  {
-    name: 'BCA VA',
-    desc: 'Virtual Account',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M6 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    name: 'BNI VA',
-    desc: 'Virtual Account',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M6 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Mandiri VA',
-    desc: 'Virtual Account',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M2 10h20" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M6 15h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Indomaret',
-    desc: 'Convenience store',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        <rect x="9" y="13" width="6" height="8" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M12 13v8" stroke="currentColor" strokeWidth="1.5" />
-      </svg>
-    ),
-  },
-  {
-    name: 'Alfamart',
-    desc: 'Convenience store',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5">
-        <path d="M3 21h18M5 21V7l7-4 7 4v14" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-        <rect x="9" y="13" width="6" height="8" stroke="currentColor" strokeWidth="1.5" />
-        <path d="M12 13v8" stroke="currentColor" strokeWidth="1.5" />
-      </svg>
-    ),
-  },
-]
-
 function waitForSnap(timeout = 10000): Promise<boolean> {
   return new Promise((resolve) => {
     if (typeof window !== 'undefined' && (window as any).snap) {
@@ -303,43 +204,33 @@ export default function PaymentSection({
 
       {/* Payment Methods */}
       <div className="mt-8 border-t border-brand-200 pt-6">
-        <p className="text-[11px] uppercase tracking-widest text-brand-400">Available Payment Methods</p>
+        <p className="text-[11px] uppercase tracking-widest text-brand-400">Metode Pembayaran</p>
 
-        {/* QRIS — Featured */}
-        <div className="mt-4 border border-brand-950 bg-brand-50 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center bg-brand-950 text-white">
-              {paymentMethods[0].icon}
+        <div className="mt-4 border border-brand-100 bg-brand-50/50 p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center bg-brand-950 text-white">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-brand-950">QRIS</p>
-              <p className="text-xs text-brand-400">Scan QR — GoPay, OVO, DANA, ShopeePay, Bank apps</p>
-            </div>
-            <span className="ml-auto text-[9px] uppercase tracking-widest text-brand-950 border border-brand-950 px-2 py-0.5">
-              Recommended
-            </span>
-          </div>
-        </div>
-
-        {/* Other Methods */}
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {paymentMethods.slice(1).map((m) => (
-            <div
-              key={m.name}
-              className="flex items-center gap-2 border border-brand-100 p-3"
-            >
-              <span className="text-brand-400">{m.icon}</span>
-              <div className="min-w-0">
-                <p className="truncate text-xs font-medium text-brand-950">{m.name}</p>
-                <p className="text-[10px] text-brand-400">{m.desc}</p>
+              <p className="text-sm font-medium text-brand-950">Pembayaran Aman via Midtrans</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-brand-400">
+                Setelah klik &quot;Pay Now&quot;, kamu akan memilih metode pembayaran di jendela Midtrans yang aman:
+              </p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-brand-500">
+                <span>QRIS (recommended)</span>
+                <span>GoPay</span>
+                <span>ShopeePay</span>
+                <span>BCA VA</span>
+                <span>BNI VA</span>
+                <span>Mandiri</span>
+                <span>Indomaret</span>
+                <span>Alfamart</span>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-
-        <p className="mt-4 text-xs text-brand-400">
-          You&apos;ll choose your payment method in the secure payment window after clicking &quot;Pay Now&quot;
-        </p>
       </div>
 
       {/* Total */}

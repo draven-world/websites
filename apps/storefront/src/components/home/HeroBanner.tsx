@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 type Banner = {
   title: string
@@ -19,20 +19,34 @@ const fallbackSlides = [
 export default function HeroBanner({ banners }: { banners: Banner[] }) {
   const slides = banners.length > 0 ? banners : fallbackSlides
   const [current, setCurrent] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const startTimer = useCallback(() => {
+    if (slides.length <= 1) return
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length)
+    }, 8000)
+  }, [slides.length])
 
   useEffect(() => {
-    if (slides.length <= 1) return
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length)
-    }, 6000)
-    return () => clearInterval(timer)
-  }, [slides.length])
+    if (paused) {
+      if (timerRef.current) clearInterval(timerRef.current)
+      return
+    }
+    startTimer()
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [paused, startTimer])
 
   const slide = slides[current]
 
   return (
     <section className="relative">
-      <div className="relative h-[90vh] min-h-[600px] w-full overflow-hidden bg-brand-950">
+      <div
+        className="relative h-[90vh] min-h-[600px] w-full overflow-hidden bg-brand-950"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         {slide.image && (
           <Image
             src={slide.image}

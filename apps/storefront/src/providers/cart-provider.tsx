@@ -23,6 +23,7 @@ type CartContextType = {
   cart: Cart
   loading: boolean
   totalItems: number
+  lastAddedAt: number
   addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void
   removeItem: (id: string) => void
   updateQuantity: (id: string, quantity: number) => void
@@ -55,6 +56,7 @@ function calcCart(items: CartItem[]): Cart {
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [lastAddedAt, setLastAddedAt] = useState(0)
 
   useEffect(() => {
     setItems(loadCart())
@@ -82,6 +84,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, { ...item, quantity }]
     })
+    setLastAddedAt(Date.now())
   }, [])
 
   const removeItem = useCallback((id: string) => {
@@ -101,7 +104,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ cart, loading, totalItems, addItem, removeItem, updateQuantity, clearCart }}
+      value={{ cart, loading, totalItems, lastAddedAt, addItem, removeItem, updateQuantity, clearCart }}
     >
       {children}
     </CartContext.Provider>

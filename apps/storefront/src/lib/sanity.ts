@@ -252,6 +252,146 @@ export async function searchSanityProducts(query: string, limit = 6) {
   }
 }
 
+// --- Store Settings ---
+export async function getStoreSettings() {
+  if (!client) return null
+  return client.fetch(`*[_type == "storeSettings"][0]`)
+}
+
+// --- Lookbook ---
+export async function getLookbooks() {
+  if (!client) return []
+  return client.fetch(`
+    *[_type == "lookbook" && aktif == true] | order(releaseDate desc) {
+      title,
+      "slug": slug.current,
+      description,
+      coverImage,
+      releaseDate,
+      "productCount": count(products)
+    }
+  `)
+}
+
+export async function getLookbook(slug: string) {
+  if (!client) return null
+  return client.fetch(
+    `*[_type == "lookbook" && slug.current == $slug && aktif == true][0] {
+      title,
+      "slug": slug.current,
+      description,
+      coverImage,
+      images,
+      releaseDate,
+      products[]->{ ${productFields} }
+    }`,
+    { slug },
+  )
+}
+
+// --- Testimonial ---
+export async function getTestimonials(featured = false) {
+  if (!client) return []
+  const filter = featured
+    ? '*[_type == "testimonial" && aktif == true && featured == true]'
+    : '*[_type == "testimonial" && aktif == true]'
+  return client.fetch(`
+    ${filter} | order(_createdAt desc) {
+      customerName,
+      city,
+      rating,
+      text,
+      photo,
+      source,
+      "product": productRef->{ title, "handle": handle.current, thumbnail }
+    }
+  `)
+}
+
+// --- Coupon ---
+export async function validateCoupon(code: string) {
+  if (!client) return null
+  return client.fetch(
+    `*[_type == "coupon" && code == $code && aktif == true && startDate <= now() && endDate >= now()][0] {
+      code,
+      type,
+      value,
+      maxDiscount,
+      minPurchase,
+      maxUses,
+      usedCount
+    }`,
+    { code: code.toUpperCase() },
+  )
+}
+
+// --- Orders (Sanity) ---
+export async function getOrdersFromSanity(limit = 50) {
+  if (!client) return []
+  return client.fetch(
+    `*[_type == "order"] | order(_createdAt desc) [0...$limit] {
+      orderId,
+      status,
+      customerName,
+      customerPhone,
+      total,
+      shippingCost,
+      subtotal,
+      shippingMethod,
+      trackingNumber,
+      items,
+      _createdAt
+    }`,
+    { limit },
+  )
+}
+
+export async function getOrderStats() {
+  if (!client) return null
+  try {
+    const [totalOrders, revenue, statusCounts] = await Promise.all([
+      client.fetch(`count(*[_type == "order"])`),
+      client.fetch(`*[_type == "order" && status in ["paid", "processing", "shipped", "delivered"]] { total }`),
+      client.fetch(`{
+        "pending": count(*[_type == "order" && status == "pending"]),
+        "paid": count(*[_type == "order" && status == "paid"]),
+        "processing": count(*[_type == "order" && status == "processing"]),
+        "shipped": count(*[_type == "order" && status == "shipped"]),
+        "delivered": count(*[_type == "order" && status == "delivered"]),
+        "cancelled": count(*[_type == "order" && status == "cancelled"])
+      }`),
+    ])
+    const totalRevenue = (revenue as Array<{ total: number }>).reduce((sum, o) => sum + (o.total || 0), 0)
+    return { totalOrders, totalRevenue, statusCounts }
+  } catch {
+    return null
+  }
+}
+
+// --- Product Stats ---
+export async function getProductStats() {
+  if (!client) return null
+  try {
+    const stats = await client.fetch(`{
+      "totalProducts": count(*[_type == "product"]),
+      "activeProducts": count(*[_type == "product" && status == "active"]),
+      "draftProducts": count(*[_type == "product" && status == "draft"]),
+      "outOfStock": count(*[_type == "product" && stock <= 0]),
+      "lowStock": count(*[_type == "product" && stock > 0 && stock <= 5]),
+      "lowStockItems": *[_type == "product" && stock > 0 && stock <= 10] | order(stock asc) [0...10] {
+        title,
+        "handle": handle.current,
+        stock,
+        price,
+        thumbnail
+      }
+    }`)
+    return stats
+  } catch {
+    return null
+  }
+}
+
 export async function getSanityProduct(handle: string) {
   if (!client) return null
   try {
