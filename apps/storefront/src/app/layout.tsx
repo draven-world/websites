@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
-import { Work_Sans } from 'next/font/google'
+import { Work_Sans, Fraunces } from 'next/font/google'
 import { CartProvider } from '@/providers/cart-provider'
 import { AuthProvider } from '@/providers/auth-provider'
 import { ToastProvider } from '@/providers/toast-provider'
@@ -11,6 +11,13 @@ const workSans = Work_Sans({
   variable: '--font-work-sans',
   display: 'swap',
   weight: ['300', '400', '500', '600', '700'],
+})
+
+const fraunces = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-fraunces',
+  display: 'swap',
+  axes: ['opsz', 'SOFT', 'WONK'],
 })
 
 const MIDTRANS_CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
@@ -38,8 +45,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={workSans.variable}>
-      <body className={workSans.className}>
+    <html lang="id" className={`${workSans.variable} ${fraunces.variable}`}>
+      <body className="font-sans">
         <AuthProvider>
           <CartProvider>
             <ToastProvider>{children}</ToastProvider>

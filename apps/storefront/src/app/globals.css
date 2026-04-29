@@ -71,3 +71,29 @@
     overflow: hidden;
   }
 }
+
+@layer components {
+  .text-eyebrow {
+    @apply text-[11px] uppercase tracking-[0.2em] font-medium;
+  }
+}
+
+@layer utilities {
+  .letter-rise {
+    display: inline-block;
+    opacity: 0;
+    animation: letter-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .accordion-grid {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 300ms ease;
+  }
+  .accordion-grid[data-open='true'] {
+    grid-template-rows: 1fr;
+  }
+  .accordion-grid > * {
+    overflow: hidden;
+  }
+}
