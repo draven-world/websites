@@ -91,6 +91,22 @@ export default function PaymentSection({
           customer_name: `${address.first_name} ${address.last_name}`.trim(),
           customer_phone: address.phone,
           items,
+          // Full order data for Sanity persistence
+          order_items: cart.items.map((item) => ({
+            productTitle: item.title,
+            variant: item.variant,
+            quantity: item.quantity,
+            price: item.price,
+            thumbnail: item.thumbnail,
+          })),
+          subtotal: cart.subtotal,
+          shipping_cost: shippingCost.cost,
+          shipping_address: address.address_1,
+          shipping_district: address.district,
+          shipping_city: address.city,
+          shipping_province: address.province,
+          shipping_postal_code: address.postal_code,
+          shipping_method: `${shippingCost.courier} ${shippingCost.service}`,
         }),
       })
 

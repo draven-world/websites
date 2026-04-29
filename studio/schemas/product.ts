@@ -196,12 +196,76 @@ export default defineType({
       group: 'variants',
     }),
 
+    // ─── STOK PER VARIAN ──────────────────────────────────
+    defineField({
+      name: 'variantStock',
+      title: 'Stok per Varian',
+      type: 'array',
+      description:
+        'Atur stok untuk setiap kombinasi ukuran/warna. Jika kosong, pakai "Stok Total" sebagai fallback.',
+      group: 'variants',
+      of: [
+        defineArrayMember({
+          type: 'object',
+          fields: [
+            {
+              name: 'size',
+              title: 'Ukuran',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'XS', value: 'XS' },
+                  { title: 'S', value: 'S' },
+                  { title: 'M', value: 'M' },
+                  { title: 'L', value: 'L' },
+                  { title: 'XL', value: 'XL' },
+                  { title: 'XXL', value: 'XXL' },
+                  { title: 'All Size', value: 'ALL' },
+                ],
+              },
+            },
+            {
+              name: 'color',
+              title: 'Warna',
+              type: 'string',
+              description: 'Nama warna (harus sama persis dengan nama di field Warna Tersedia)',
+            },
+            {
+              name: 'stock',
+              title: 'Stok',
+              type: 'number',
+              validation: (Rule: any) => Rule.required().min(0).integer(),
+              initialValue: 0,
+            },
+          ],
+          preview: {
+            select: { size: 'size', color: 'color', stock: 'stock' },
+            prepare({
+              size,
+              color,
+              stock,
+            }: {
+              size?: string
+              color?: string
+              stock?: number
+            }) {
+              const label = [size, color].filter(Boolean).join(' / ') || 'Default'
+              const qty = stock ?? 0
+              const icon = qty === 0 ? '🔴' : qty <= 5 ? '🟡' : '🟢'
+              return { title: `${icon} ${label}`, subtitle: `Stok: ${qty}` }
+            },
+          },
+        }),
+      ],
+    }),
+
     // ─── STOK & PENGIRIMAN ────────────────────────────────
     defineField({
       name: 'stock',
-      title: 'Stok',
+      title: 'Stok Total (Fallback)',
       type: 'number',
-      description: 'Jumlah stok tersedia. Set 0 untuk tampilkan "Habis".',
+      description:
+        'Stok total sebagai fallback jika "Stok per Varian" tidak diisi. Jika varian diisi, field ini diabaikan.',
       fieldset: 'inventory',
       group: 'variants',
       initialValue: 50,

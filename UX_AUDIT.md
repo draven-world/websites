@@ -13,7 +13,7 @@
 | Critical | 6 | Done |
 | High | 6 | Done |
 | Medium | 4 | Done |
-| Low | 3 | Pending |
+| Low | 3 | Done (2/3, dark mode skipped) |
 
 ---
 

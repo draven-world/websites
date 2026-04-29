@@ -15,6 +15,19 @@ function getSanityClient(): SanityClient | null {
 
 const client = getSanityClient()
 
+// Write-enabled client for mutations (create/update orders)
+function getSanityWriteClient(): SanityClient | null {
+  const token = process.env.SANITY_API_TOKEN
+  if (!projectId || !token) return null
+  return createClient({
+    projectId,
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
+    apiVersion: '2024-01-01',
+    useCdn: false,
+    token,
+  })
+}
+
 export function urlFor(source: unknown) {
   if (!client) return { width: () => ({ height: () => ({ url: () => '' }) }) }
   const builder = imageUrlBuilder(client)
@@ -129,6 +142,7 @@ export type SanityProduct = {
   compareAtPrice: number | null
   sizes: string[] | null
   colors: Array<{ name: string; hex: string }> | null
+  variantStock: Array<{ size?: string; color?: string; stock: number }> | null
   stock: number
   weight: number
   sku: string | null
@@ -150,6 +164,7 @@ const productFields = `
   compareAtPrice,
   sizes,
   colors,
+  variantStock,
   stock,
   weight,
   sku,
@@ -195,16 +210,79 @@ function transformProduct(p: SanityProduct) {
     })
   }
 
-  // Build variant — single variant with the price
-  const variants = [
-    {
+  // --- Per-variant stock lookup ---
+  // If variantStock is filled, use it (strict per-variant).
+  // Otherwise fall back to the global stock field.
+  const vs = p.variantStock
+  const hasVariantStock = vs && vs.length > 0
+
+  function getStock(size?: string, color?: string): number {
+    if (!hasVariantStock) return p.stock
+    const match = vs!.find((entry) => {
+      const sizeOk = size ? entry.size === size : !entry.size
+      const colorOk = color ? entry.color === color : !entry.color
+      return sizeOk && colorOk
+    })
+    // Strict: if no matching entry exists, stock = 0
+    return match?.stock ?? 0
+  }
+
+  // Build variants for each size×color combination
+  const hasSizes = p.sizes && p.sizes.length > 0
+  const hasColors = p.colors && p.colors.length > 0
+  const variants: Array<{
+    id: string
+    title: string
+    inventory_quantity: number
+    options: Array<{ value: string }>
+    prices: Array<{ currency_code: string; amount: number }>
+  }> = []
+
+  if (hasSizes && hasColors) {
+    // Size × Color matrix
+    for (const size of p.sizes!) {
+      for (const color of p.colors!) {
+        variants.push({
+          id: `${p._id}-${size}-${color.name}`.toLowerCase().replace(/\s+/g, '-'),
+          title: `${size} / ${color.name}`,
+          inventory_quantity: getStock(size, color.name),
+          options: [{ value: size }, { value: color.name }],
+          prices: [{ currency_code: 'idr', amount: p.price }],
+        })
+      }
+    }
+  } else if (hasSizes) {
+    // Size only
+    for (const size of p.sizes!) {
+      variants.push({
+        id: `${p._id}-${size}`.toLowerCase().replace(/\s+/g, '-'),
+        title: size,
+        inventory_quantity: getStock(size, undefined),
+        options: [{ value: size }],
+        prices: [{ currency_code: 'idr', amount: p.price }],
+      })
+    }
+  } else if (hasColors) {
+    // Color only
+    for (const color of p.colors!) {
+      variants.push({
+        id: `${p._id}-${color.name}`.toLowerCase().replace(/\s+/g, '-'),
+        title: color.name,
+        inventory_quantity: getStock(undefined, color.name),
+        options: [{ value: color.name }],
+        prices: [{ currency_code: 'idr', amount: p.price }],
+      })
+    }
+  } else {
+    // No variants — single default
+    variants.push({
       id: p._id,
-      title: p.sizes?.[0] || 'Default',
+      title: 'Default',
       inventory_quantity: p.stock,
-      options: p.sizes ? [{ value: p.sizes[0] || 'ALL' }] : [{ value: 'ALL' }],
+      options: [{ value: 'ALL' }],
       prices: [{ currency_code: 'idr', amount: p.price }],
-    },
-  ]
+    })
+  }
 
   return {
     id: p._id,
@@ -217,6 +295,8 @@ function transformProduct(p: SanityProduct) {
     images: galleryImages,
     options,
     variants,
+    sizes: p.sizes || [],
+    colors: p.colors || [],
     collection: p.category ? { title: p.category.name } : null,
     tags: p.tags || [],
     weight: p.weight,
@@ -334,11 +414,18 @@ export async function getOrdersFromSanity(limit = 50) {
       status,
       customerName,
       customerPhone,
+      customerEmail,
       total,
       shippingCost,
       subtotal,
+      shippingAddress,
+      shippingCity,
+      shippingProvince,
       shippingMethod,
       trackingNumber,
+      paymentMethod,
+      midtransId,
+      paidAt,
       items,
       _createdAt
     }`,
@@ -402,6 +489,100 @@ export async function getSanityProduct(handle: string) {
     if (!product) return null
     return transformProduct(product)
   } catch {
+    return null
+  }
+}
+
+// --- Order Write Operations ---
+export type CreateOrderData = {
+  orderId: string
+  customerName: string
+  customerPhone: string
+  customerEmail?: string
+  items: Array<{
+    productTitle: string
+    variant: string
+    quantity: number
+    price: number
+    thumbnail?: string | null
+  }>
+  subtotal: number
+  shippingCost: number
+  total: number
+  shippingAddress: string
+  shippingCity: string
+  shippingProvince: string
+  shippingPostalCode?: string
+  shippingDistrict?: string
+  shippingMethod: string
+}
+
+export async function createOrderInSanity(data: CreateOrderData) {
+  const writeClient = getSanityWriteClient()
+  if (!writeClient) {
+    console.warn('[Sanity] No write client — SANITY_API_TOKEN not configured')
+    return null
+  }
+  try {
+    const doc = await writeClient.create({
+      _type: 'order',
+      orderId: data.orderId,
+      status: 'pending',
+      customerName: data.customerName,
+      customerPhone: data.customerPhone,
+      customerEmail: data.customerEmail || '',
+      items: data.items.map((item) => ({
+        _type: 'object',
+        _key: `item-${Math.random().toString(36).slice(2, 8)}`,
+        productTitle: item.productTitle,
+        variant: item.variant,
+        quantity: item.quantity,
+        price: item.price,
+        thumbnail: item.thumbnail || '',
+      })),
+      subtotal: data.subtotal,
+      shippingCost: data.shippingCost,
+      discount: 0,
+      total: data.total,
+      shippingAddress: data.shippingAddress,
+      shippingCity: data.shippingCity,
+      shippingProvince: data.shippingProvince,
+      shippingMethod: data.shippingMethod,
+    })
+    console.log(`[Sanity] Order created: ${data.orderId}`)
+    return doc
+  } catch (err) {
+    console.error('[Sanity] Failed to create order:', err)
+    return null
+  }
+}
+
+export async function updateOrderStatus(
+  orderId: string,
+  status: string,
+  extra?: { paymentMethod?: string; midtransId?: string; paidAt?: string },
+) {
+  const writeClient = getSanityWriteClient()
+  if (!writeClient) return null
+  try {
+    // Find the Sanity document by orderId
+    const doc = await writeClient.fetch<{ _id: string } | null>(
+      `*[_type == "order" && orderId == $orderId][0]{ _id }`,
+      { orderId },
+    )
+    if (!doc) {
+      console.warn(`[Sanity] Order not found: ${orderId}`)
+      return null
+    }
+    const patch = writeClient.patch(doc._id).set({ status })
+    if (extra?.paymentMethod) patch.set({ paymentMethod: extra.paymentMethod })
+    if (extra?.midtransId) patch.set({ midtransId: extra.midtransId })
+    if (extra?.paidAt) patch.set({ paidAt: extra.paidAt })
+    const result = await patch.commit()
+    console.log(`[Sanity] Order ${orderId} updated to ${status}`)
+    return result
+  } catch (err) {
+    console.error('[Sanity] Failed to update order:', err)
     return null
   }
 }

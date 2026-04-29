@@ -7,11 +7,18 @@ type Order = {
   status: string
   customerName: string
   customerPhone: string
+  customerEmail: string | null
   total: number
   subtotal: number
   shippingCost: number
+  shippingAddress: string | null
+  shippingCity: string | null
+  shippingProvince: string | null
   shippingMethod: string
   trackingNumber: string | null
+  paymentMethod: string | null
+  midtransId: string | null
+  paidAt: string | null
   items: Array<{
     productTitle: string
     variant: string
@@ -139,10 +146,11 @@ export default function OrdersPage() {
 
                 {isExpanded && (
                   <div className="border-t border-gray-100 px-4 pb-4 pt-3">
-                    <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {/* Pelanggan */}
                       <div>
                         <p className="text-xs font-medium uppercase text-gray-400">Pelanggan</p>
-                        <p className="mt-1 text-sm text-gray-900">{order.customerName}</p>
+                        <p className="mt-1 text-sm font-medium text-gray-900">{order.customerName}</p>
                         {order.customerPhone && (
                           <a
                             href={`https://wa.me/${order.customerPhone.replace(/^0/, '62')}`}
@@ -153,7 +161,29 @@ export default function OrdersPage() {
                             WhatsApp: {order.customerPhone}
                           </a>
                         )}
+                        {order.customerEmail && (
+                          <p className="text-xs text-gray-500">{order.customerEmail}</p>
+                        )}
                       </div>
+
+                      {/* Alamat Pengiriman */}
+                      <div>
+                        <p className="text-xs font-medium uppercase text-gray-400">Alamat Pengiriman</p>
+                        {order.shippingAddress ? (
+                          <div className="mt-1 text-sm text-gray-700">
+                            <p>{order.shippingAddress}</p>
+                            <p>
+                              {[order.shippingCity, order.shippingProvince]
+                                .filter(Boolean)
+                                .join(', ')}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="mt-1 text-sm italic text-gray-400">Belum ada data</p>
+                        )}
+                      </div>
+
+                      {/* Pengiriman & Pembayaran */}
                       <div>
                         <p className="text-xs font-medium uppercase text-gray-400">Pengiriman</p>
                         <p className="mt-1 text-sm text-gray-900">
@@ -162,6 +192,17 @@ export default function OrdersPage() {
                         {order.trackingNumber && (
                           <p className="text-xs text-gray-600">
                             Resi: <span className="font-mono font-bold">{order.trackingNumber}</span>
+                          </p>
+                        )}
+                        {order.paymentMethod && (
+                          <div className="mt-2">
+                            <p className="text-xs font-medium uppercase text-gray-400">Pembayaran</p>
+                            <p className="mt-0.5 text-sm text-gray-700">{order.paymentMethod}</p>
+                          </div>
+                        )}
+                        {order.paidAt && (
+                          <p className="text-xs text-green-600">
+                            Dibayar: {formatDate(order.paidAt)}
                           </p>
                         )}
                       </div>

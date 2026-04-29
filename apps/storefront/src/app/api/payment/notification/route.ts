@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySignature } from '@/lib/midtrans'
+import { updateOrderStatus } from '@/lib/sanity'
 import { sendWhatsApp, paymentConfirmedMessage } from '@/lib/whatsapp'
 
 // Midtrans webhook — called by Midtrans server when payment status changes
@@ -14,6 +15,9 @@ export async function POST(req: NextRequest) {
       signature_key,
       transaction_status,
       fraud_status,
+      payment_type,
+      transaction_id,
+      settlement_time,
     } = body
 
     // Verify signature
@@ -23,38 +27,33 @@ export async function POST(req: NextRequest) {
     }
 
     // Determine payment status
-    let status: 'success' | 'pending' | 'failed' | 'expired' = 'pending'
+    let status: 'pending' | 'paid' | 'cancelled' = 'pending'
 
     if (transaction_status === 'capture') {
-      status = fraud_status === 'accept' ? 'success' : 'pending'
+      status = fraud_status === 'accept' ? 'paid' : 'pending'
     } else if (transaction_status === 'settlement') {
-      status = 'success'
-    } else if (['cancel', 'deny'].includes(transaction_status)) {
-      status = 'failed'
-    } else if (transaction_status === 'expire') {
-      status = 'expired'
+      status = 'paid'
+    } else if (['cancel', 'deny', 'expire'].includes(transaction_status)) {
+      status = 'cancelled'
     }
-
-    // TODO: Update order status in Medusa when connected
-    // await medusa.admin.orders.update(order_id, { status })
 
     console.log(`[Midtrans] Order ${order_id}: ${transaction_status} → ${status}`)
 
-    // Send WhatsApp on successful payment
-    if (status === 'success') {
-      // TODO: Fetch customer details from order
-      // For now, log the event
-      console.log(`[Midtrans] Payment confirmed for order ${order_id}`)
+    // Update order in Sanity
+    updateOrderStatus(order_id, status, {
+      paymentMethod: payment_type || undefined,
+      midtransId: transaction_id || undefined,
+      paidAt: status === 'paid' ? (settlement_time || new Date().toISOString()) : undefined,
+    }).catch((err) => console.error('[Webhook] Failed to update Sanity:', err))
 
-      // If customer phone is included in metadata, send notification
-      if (body.custom_field1) {
-        const [customerName, customerPhone] = body.custom_field1.split('|')
-        if (customerPhone) {
-          sendWhatsApp(
-            customerPhone,
-            paymentConfirmedMessage(order_id, customerName || 'Pelanggan'),
-          ).catch(() => {})
-        }
+    // Send WhatsApp on successful payment
+    if (status === 'paid' && body.custom_field1) {
+      const [customerName, customerPhone] = body.custom_field1.split('|')
+      if (customerPhone) {
+        sendWhatsApp(
+          customerPhone,
+          paymentConfirmedMessage(order_id, customerName || 'Pelanggan'),
+        ).catch(() => {})
       }
     }
 

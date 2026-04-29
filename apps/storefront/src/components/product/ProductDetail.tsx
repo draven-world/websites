@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { useCart } from '@/providers/cart-provider'
 import { useToast } from '@/providers/toast-provider'
 import { formatRupiah } from '@/lib/utils'
 import VariantSelector from './VariantSelector'
 import SanityContent from '@/components/sanity/SanityContent'
+
+const BLUR_DATA =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mN8+P9/PQAJhAN8xGmFjwAAAABJRU5ErkJggg=='
 
 type Variant = {
   id: string
@@ -41,13 +44,41 @@ export default function ProductDetail({ product }: { product: Product }) {
 
   const price = selectedVariant?.prices?.find((p) => p.currency_code === 'idr')
   const priceAmount = price?.amount ?? 0
-  const inStock = (selectedVariant?.inventory_quantity ?? 0) > 0
+  const variantQty = selectedVariant?.inventory_quantity ?? 0
+  const inStock = variantQty > 0
+  const lowStock = inStock && variantQty <= 5
+  const allSoldOut = product.variants.every((v) => (v.inventory_quantity ?? 0) <= 0)
 
   const images = product.images?.length > 0
     ? product.images
     : product.thumbnail
       ? [{ id: 'thumb', url: product.thumbnail }]
       : []
+
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (images.length <= 1) return
+    if (e.key === 'ArrowLeft') {
+      setSelectedImage((prev) => (prev - 1 + images.length) % images.length)
+    } else if (e.key === 'ArrowRight') {
+      setSelectedImage((prev) => (prev + 1) % images.length)
+    }
+  }, [images.length])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
+
+  // Build readable variant label from selected options
+  function getVariantLabel(): string {
+    if (!selectedVariant) return 'Default'
+    // Use option values if available
+    const parts = selectedVariant.options
+      ?.map((o) => o.value)
+      .filter((v) => v && v !== 'ALL')
+    if (parts && parts.length > 0) return parts.join(' / ')
+    return selectedVariant.title || 'Default'
+  }
 
   function handleAddToCart() {
     if (!selectedVariant || !inStock) return
@@ -57,7 +88,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       productId: product.id,
       title: product.title,
       handle: product.handle,
-      variant: selectedVariant.title || 'Default',
+      variant: getVariantLabel(),
       thumbnail: product.thumbnail,
       price: priceAmount,
     })
@@ -80,6 +111,8 @@ export default function ProductDetail({ product }: { product: Product }) {
                 fill
                 className="object-cover"
                 priority
+                placeholder="blur"
+                blurDataURL={BLUR_DATA}
               />
             </div>
             {images.length > 1 && (
@@ -131,11 +164,36 @@ export default function ProductDetail({ product }: { product: Product }) {
           </div>
         )}
 
+        {/* Stock Indicator */}
+        <div className="mt-6">
+          {allSoldOut ? (
+            <div className="flex items-center gap-2 rounded bg-red-50 px-4 py-3">
+              <span className="h-2 w-2 rounded-full bg-red-500" />
+              <span className="text-sm font-medium text-red-700">Stok Habis — Semua varian tidak tersedia</span>
+            </div>
+          ) : !inStock ? (
+            <div className="flex items-center gap-2 rounded bg-red-50 px-4 py-3">
+              <span className="h-2 w-2 rounded-full bg-red-500" />
+              <span className="text-sm text-red-600">Varian ini habis — pilih ukuran/warna lain</span>
+            </div>
+          ) : lowStock ? (
+            <div className="flex items-center gap-2 rounded bg-amber-50 px-4 py-3">
+              <span className="h-2 w-2 rounded-full bg-amber-500" />
+              <span className="text-sm text-amber-700">Sisa {variantQty} — Hampir habis!</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="text-sm text-brand-500">Stok tersedia ({variantQty})</span>
+            </div>
+          )}
+        </div>
+
         {/* Add to Cart */}
         <button
           onClick={handleAddToCart}
           disabled={!inStock || adding || added}
-          className={`mt-8 w-full py-4 text-[13px] font-medium uppercase tracking-widest transition-all active:scale-[0.98] ${
+          className={`mt-4 w-full py-4 text-[13px] font-medium uppercase tracking-widest transition-all active:scale-[0.98] ${
             added
               ? 'bg-brand-800 text-white'
               : !inStock
@@ -143,7 +201,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 : 'bg-brand-950 text-white hover:bg-brand-800'
           }`}
         >
-          {adding ? 'Adding...' : added ? 'Added' : !inStock ? 'Sold Out' : 'Add to Bag'}
+          {adding ? 'Menambahkan...' : added ? 'Ditambahkan ✓' : !inStock ? 'Stok Habis' : 'Tambah ke Tas'}
         </button>
 
         {/* Trust Badges */}
