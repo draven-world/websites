@@ -4,6 +4,7 @@ import { Work_Sans, Fraunces } from 'next/font/google'
 import { CartProvider } from '@/providers/cart-provider'
 import { AuthProvider } from '@/providers/auth-provider'
 import { ToastProvider } from '@/providers/toast-provider'
+import AnnouncementBar from '@/components/layout/AnnouncementBar'
 import './globals.css'
 
 const workSans = Work_Sans({
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="id" className={`${workSans.variable} ${fraunces.variable}`}>
       <body className="font-sans">
+        <AnnouncementBar />
         <AuthProvider>
           <CartProvider>
             <ToastProvider>{children}</ToastProvider>
