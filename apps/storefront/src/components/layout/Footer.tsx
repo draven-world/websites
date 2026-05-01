@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import NewsletterForm from '@/components/ui/NewsletterForm'
 
 const columns = [
   {
@@ -107,25 +106,6 @@ function MobileColumn({ label, links }: { label: string; links: ReadonlyArray<{ 
 export default function Footer() {
   return (
     <footer>
-      {/* Newsletter band */}
-      <section className="border-y border-brand-100 bg-white">
-        <div className="mx-auto max-w-container px-5 py-20 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-eyebrow text-brand-400">Newsletter</p>
-            <h2 className="mt-6 font-serif text-display-sm text-brand-950">Stay in the loop.</h2>
-            <p className="mt-4 text-sm text-brand-500">
-              New drops, lookbooks, and members-only releases — straight to your inbox.
-            </p>
-            <div className="mt-8 flex justify-center">
-              <NewsletterForm />
-            </div>
-            <p className="mt-6 text-[10px] uppercase tracking-[0.2em] text-brand-300">
-              By subscribing you agree to our Privacy Policy.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Main footer */}
       <div className="bg-brand-950 text-white">
         <div className="mx-auto max-w-container px-5 py-16 lg:px-8 lg:py-20">
