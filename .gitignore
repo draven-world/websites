@@ -32,6 +32,11 @@ pnpm-debug.log*
 
 # Sanity
 studio/dist/
+studio/.sanity/
+studio/.claude/
+
+# TypeScript incremental build cache
+*.tsbuildinfo
 
 # Medusa
 apps/medusa/uploads/

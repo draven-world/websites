@@ -17,18 +17,11 @@ const nextConfig = {
       },
     ],
   },
-  // Speedup dev compilation
   typescript: {
-    // Type check di CI/build saja, skip saat dev
-    ignoreBuildErrors: process.env.NODE_ENV === 'development',
+    ignoreBuildErrors: false,
   },
   eslint: {
-    // Lint di CI/build saja, skip saat dev
-    ignoreDuringBuilds: process.env.NODE_ENV === 'development',
-  },
-  experimental: {
-    // Optimasi Windows file watching
-    webpackBuildWorker: true,
+    ignoreDuringBuilds: false,
   },
 }
 
