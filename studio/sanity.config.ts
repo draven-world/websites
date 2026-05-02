@@ -33,6 +33,7 @@ const deskStructure = (S: StructureBuilder) =>
             .items([
               S.documentTypeListItem('page').title('Halaman Statis'),
               S.documentTypeListItem('faq').title('FAQ'),
+              S.documentTypeListItem('gallery').title('Galeri'),
               S.documentTypeListItem('lookbook').title('Lookbook / Koleksi'),
               S.documentTypeListItem('testimonial').title('Testimoni'),
             ]),
