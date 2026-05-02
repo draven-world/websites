@@ -369,6 +369,34 @@ export async function getLookbook(slug: string) {
   )
 }
 
+// --- Gallery ---
+export type GalleryItem = {
+  _id: string
+  image: unknown
+  caption: string | null
+  credit: string | null
+  creditUrl: string | null
+  tags: string[] | null
+  featured: boolean | null
+  product: { title: string; handle: string } | null
+}
+
+export async function getGalleryItems(): Promise<GalleryItem[]> {
+  if (!client) return []
+  return client.fetch(`
+    *[_type == "gallery" && aktif == true] | order(coalesce(urutan, 9999) asc, tanggalUpload desc) {
+      _id,
+      image,
+      caption,
+      credit,
+      creditUrl,
+      tags,
+      featured,
+      "product": product->{ title, "handle": handle.current }
+    }
+  `)
+}
+
 // --- Testimonial ---
 export async function getTestimonials(featured = false) {
   if (!client) return []

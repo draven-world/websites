@@ -89,8 +89,8 @@ export default function Header() {
               <Link href="/tentang-kami" className="text-[13px] uppercase tracking-widest text-brand-950 transition-opacity hover:opacity-50">
                 About
               </Link>
-              <Link href="/komunitas" className="text-[13px] uppercase tracking-widest text-brand-950 transition-opacity hover:opacity-50">
-                Community
+              <Link href="/gallery" className="text-[13px] uppercase tracking-widest text-brand-950 transition-opacity hover:opacity-50">
+                Gallery
               </Link>
             </nav>
           </div>
@@ -251,7 +251,7 @@ export default function Header() {
             {[
               { label: 'Shop', href: '/products' },
               { label: 'About', href: '/tentang-kami' },
-              { label: 'Community', href: '/komunitas' },
+              { label: 'Gallery', href: '/gallery' },
               { label: 'FAQ', href: '/faq' },
             ].map((item) => (
               <Link

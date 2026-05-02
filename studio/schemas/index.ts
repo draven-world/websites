@@ -10,6 +10,7 @@ import storeSettings from './store-settings'
 import coupon from './coupon'
 import lookbook from './lookbook'
 import testimonial from './testimonial'
+import gallery from './gallery'
 
 export const schemaTypes = [
   product,
@@ -23,5 +24,6 @@ export const schemaTypes = [
   faq,
   lookbook,
   testimonial,
+  gallery,
   storeSettings,
 ]

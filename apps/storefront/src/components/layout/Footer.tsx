@@ -187,8 +187,8 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/komunitas" className="text-sm text-white/60 transition-colors hover:text-white">
-                    Community
+                  <Link href="/gallery" className="text-sm text-white/60 transition-colors hover:text-white">
+                    Gallery
                   </Link>
                 </li>
               </ul>
