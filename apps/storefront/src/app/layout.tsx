@@ -46,8 +46,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id" className={`${workSans.variable} ${fraunces.variable}`}>
-      <body className="font-sans">
+    <html lang="en" className={`${workSans.variable} ${fraunces.variable}`}>
+      <body className="bg-ink-950 text-ink-100 antialiased">
         <AnnouncementBar />
         <AuthProvider>
           <CartProvider>

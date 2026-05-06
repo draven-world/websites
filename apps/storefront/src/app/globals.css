@@ -3,97 +3,51 @@
 @tailwind utilities;
 
 @layer base {
+  html { scroll-behavior: smooth; }
   body {
-    @apply bg-white text-brand-950 antialiased;
+    background-color: #0a0a0a;
+    color: #e5e5e5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
   ::selection {
-    @apply bg-brand-950 text-white;
+    background-color: #c6ff3d;
+    color: #0a0a0a;
   }
+  /* Hide scrollbar for horizontal scroll containers */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  /* Body scrollbar — slim, dark */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #0a0a0a; }
+  ::-webkit-scrollbar-thumb { background: #262626; }
+  ::-webkit-scrollbar-thumb:hover { background: #737373; }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center bg-brand-950 px-8 py-3.5 text-[13px] font-medium uppercase tracking-widest text-white transition-all hover:bg-brand-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-30;
+    @apply inline-flex items-center justify-center bg-accent-lime text-ink-950
+           font-bold uppercase tracking-widest text-sm py-4 px-8
+           transition-colors duration-200 hover:bg-ink-50;
   }
-
-  .btn-secondary {
-    @apply inline-flex items-center justify-center border border-brand-950 px-8 py-3.5 text-[13px] font-medium uppercase tracking-widest text-brand-950 transition-all hover:bg-brand-950 hover:text-white active:scale-[0.98];
+  .btn-ghost {
+    @apply inline-flex items-center justify-center border border-ink-700 text-ink-100
+           font-bold uppercase tracking-widest text-sm py-4 px-8
+           transition-colors duration-200 hover:border-ink-100;
   }
-
-  .input-field {
-    @apply w-full border-b border-brand-300 bg-transparent px-0 py-3 text-sm text-brand-950 placeholder:text-brand-400 transition-colors focus:border-brand-950 focus:outline-none;
-  }
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .underline-input {
+    @apply w-full bg-transparent border-0 border-b border-ink-700 px-0 py-3
+           text-ink-100 placeholder-ink-500
+           focus:outline-none focus:border-accent-lime
+           transition-colors duration-200;
   }
 }
 
-.animate-slide-up {
-  animation: slide-up 0.25s ease-out;
-}
-
-@keyframes badge-bounce {
-  0%, 100% { transform: scale(1); }
-  30% { transform: scale(1.5); }
-  60% { transform: scale(0.85); }
-  80% { transform: scale(1.15); }
-}
-
-.animate-badge-bounce {
-  animation: badge-bounce 0.5s ease-out;
-}
-
-@layer utilities {
-  .line-clamp-1 {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-}
-
-@layer components {
-  .text-eyebrow {
-    @apply text-[11px] uppercase tracking-[0.2em] font-medium;
-  }
-}
-
-@layer utilities {
-  .letter-rise {
-    display: inline-block;
-    opacity: 0;
-    animation: letter-rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  .accordion-grid {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows 300ms ease;
-  }
-  .accordion-grid[data-open='true'] {
-    grid-template-rows: 1fr;
-  }
-  .accordion-grid > * {
-    overflow: hidden;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
