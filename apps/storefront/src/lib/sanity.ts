@@ -149,6 +149,7 @@ export type SanityProduct = {
   status: string
   featured: boolean
   tags: string[] | null
+  badge: string | null
   category: { name: string; slug: string } | null
 }
 
@@ -171,6 +172,7 @@ const productFields = `
   status,
   featured,
   tags,
+  badge,
   category->{ name, "slug": slug.current }
 `
 
@@ -613,4 +615,58 @@ export async function updateOrderStatus(
     console.error('[Sanity] Failed to update order:', err)
     return null
   }
+}
+
+// --- Homepage ---
+export async function getHomepage() {
+  if (!client) return null
+  return client.fetch(`*[_type == "homepage"][0]{
+    heroVideo,
+    "heroImage": heroImage.asset->url,
+    "featuredCollection": featuredCollection->{
+      _id,
+      title,
+      "slug": slug.current,
+      "products": *[_type == "product" && references(^._id)][0...3]{
+        _id,
+        title,
+        "handle": slug.current,
+        "thumbnail": images[0].asset->url,
+        badge,
+        "price": variants[0].prices[0].amount
+      }
+    },
+    lookbookImages[]{
+      "image": image.asset->url,
+      caption
+    },
+    closingStatement
+  }`)
+}
+
+// --- Size Guide ---
+export async function getSizeGuide() {
+  if (!client) return null
+  return client.fetch(`*[_type == "sizeGuide"][0]{
+    intro,
+    sections[]{
+      garmentType,
+      note,
+      measurements[]{
+        size,
+        chest,
+        length,
+        sleeve
+      }
+    }
+  }`)
+}
+
+// --- Terms ---
+export async function getTerms() {
+  if (!client) return null
+  return client.fetch(`*[_type == "terms"][0]{
+    title,
+    body
+  }`)
 }
