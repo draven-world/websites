@@ -1,25 +1,10 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
-import { Work_Sans, Fraunces } from 'next/font/google'
 import { CartProvider } from '@/providers/cart-provider'
 import { AuthProvider } from '@/providers/auth-provider'
 import { ToastProvider } from '@/providers/toast-provider'
 import AnnouncementBar from '@/components/layout/AnnouncementBar'
 import './globals.css'
-
-const workSans = Work_Sans({
-  subsets: ['latin'],
-  variable: '--font-work-sans',
-  display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
-})
-
-const fraunces = Fraunces({
-  subsets: ['latin'],
-  variable: '--font-fraunces',
-  display: 'swap',
-  axes: ['opsz', 'SOFT', 'WONK'],
-})
 
 const MIDTRANS_CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
 const MIDTRANS_SNAP_URL = process.env.NODE_ENV === 'production'
@@ -46,7 +31,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${workSans.variable} ${fraunces.variable}`}>
+    <html lang="en">
       <body className="bg-ink-950 text-ink-100 antialiased">
         <AnnouncementBar />
         <AuthProvider>
