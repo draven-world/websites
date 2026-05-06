@@ -11,6 +11,9 @@ import coupon from './coupon'
 import lookbook from './lookbook'
 import testimonial from './testimonial'
 import gallery from './gallery'
+import { homepage } from './homepage'
+import { sizeGuide } from './sizeGuide'
+import { terms } from './terms'
 
 export const schemaTypes = [
   product,
@@ -26,4 +29,7 @@ export const schemaTypes = [
   testimonial,
   gallery,
   storeSettings,
+  homepage,
+  sizeGuide,
+  terms,
 ]

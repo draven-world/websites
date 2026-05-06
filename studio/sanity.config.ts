@@ -31,11 +31,17 @@ const deskStructure = (S: StructureBuilder) =>
           S.list()
             .title('Manajemen Konten')
             .items([
+              S.listItem().title('Homepage').id('homepage')
+                .child(S.document().schemaType('homepage').documentId('homepage')),
               S.documentTypeListItem('page').title('Halaman Statis'),
               S.documentTypeListItem('faq').title('FAQ'),
               S.documentTypeListItem('gallery').title('Galeri'),
               S.documentTypeListItem('lookbook').title('Lookbook / Koleksi'),
               S.documentTypeListItem('testimonial').title('Testimoni'),
+              S.listItem().title('Size Guide').id('sizeGuide')
+                .child(S.document().schemaType('sizeGuide').documentId('sizeGuide')),
+              S.listItem().title('Terms').id('terms')
+                .child(S.document().schemaType('terms').documentId('terms')),
             ]),
         ),
 

@@ -289,6 +289,22 @@ export default defineType({
       group: 'variants',
     }),
 
+    // ─── BADGE ────────────────────────────────────────────
+    defineField({
+      name: 'badge',
+      title: 'Badge (optional pill above title)',
+      type: 'string',
+      group: 'info',
+      options: {
+        list: [
+          { title: 'New', value: 'NEW' },
+          { title: 'Glow in the Dark', value: 'GLOW IN THE DARK' },
+          { title: 'Last Pieces', value: 'LAST PIECES' },
+          { title: 'Coming Soon', value: 'COMING SOON' },
+        ],
+      },
+    }),
+
     // ─── STATUS ───────────────────────────────────────────
     defineField({
       name: 'status',
