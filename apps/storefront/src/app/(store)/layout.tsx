@@ -1,14 +1,11 @@
-import Header from '@/components/layout/Header'
-import Footer from '@/components/layout/Footer'
-import MobileNav from '@/components/layout/MobileNav'
+import { ReactNode } from 'react'
+import SiteChrome from '@/components/layout/SiteChrome'
 
-export default function StoreLayout({ children }: { children: React.ReactNode }) {
+export default function StoreLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Header />
-      <main className="pb-14 md:pb-0">{children}</main>
-      <Footer />
-      <MobileNav />
+      <SiteChrome />
+      <main className="min-h-screen">{children}</main>
     </>
   )
 }
