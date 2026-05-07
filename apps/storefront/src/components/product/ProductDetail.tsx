@@ -1,12 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
+import { useState, useCallback } from 'react'
+import { formatRupiah } from '@/lib/utils'
 import { useCart } from '@/providers/cart-provider'
 import { useToast } from '@/providers/toast-provider'
-import { formatRupiah } from '@/lib/utils'
-import VariantSelector from './VariantSelector'
-import SanityContent from '@/components/sanity/SanityContent'
+import PillBadge from '@/components/ui/PillBadge'
 import Accordion from '@/components/ui/Accordion'
 
 const BLUR_DATA =
@@ -36,20 +35,14 @@ type Product = {
 }
 
 export default function ProductDetail({ product }: { product: Product }) {
-  const [selectedVariant, setSelectedVariant] = useState<Variant>(product.variants[0])
-  const [adding, setAdding] = useState(false)
-  const [added, setAdded] = useState(false)
-  const [mobileIndex, setMobileIndex] = useState(0)
-  const mobileGalleryRef = useRef<HTMLDivElement | null>(null)
   const { addItem } = useCart()
   const { toast } = useToast()
+  const [selectedSize, setSelectedSize] = useState<string | null>(null)
+  const [adding, setAdding] = useState(false)
+  const [added, setAdded] = useState(false)
 
-  const price = selectedVariant?.prices?.find((p) => p.currency_code === 'idr')
-  const priceAmount = price?.amount ?? 0
-  const variantQty = selectedVariant?.inventory_quantity ?? 0
-  const inStock = variantQty > 0
-  const lowStock = inStock && variantQty <= 5
-  const allSoldOut = product.variants.every((v) => (v.inventory_quantity ?? 0) <= 0)
+  const sizeOption = product.options?.find((o) => /size|ukuran/i.test(o.title))
+  const sizes = sizeOption?.values?.map((v) => v.value) ?? []
 
   const images =
     product.images?.length > 0
@@ -58,223 +51,167 @@ export default function ProductDetail({ product }: { product: Product }) {
         ? [{ id: 'thumb', url: product.thumbnail }]
         : []
 
-  useEffect(() => {
-    const el = mobileGalleryRef.current
-    if (!el) return
-    function onScroll() {
-      if (!el) return
-      const idx = Math.round(el.scrollLeft / el.clientWidth)
-      setMobileIndex(idx)
-    }
-    el.addEventListener('scroll', onScroll, { passive: true })
-    return () => el.removeEventListener('scroll', onScroll)
-  }, [])
+  const matchingVariant =
+    product.variants.find((v) => {
+      if (!selectedSize) return true
+      return v.options?.some((o) => o.value === selectedSize)
+    }) ?? product.variants[0]
+
+  const price = matchingVariant?.prices.find((p) => p.currency_code === 'idr')?.amount ?? 0
+  const variantSoldOut = (matchingVariant?.inventory_quantity ?? 0) <= 0
+  const allSoldOut = product.variants.every((v) => (v.inventory_quantity ?? 0) <= 0)
 
   function getVariantLabel(): string {
-    if (!selectedVariant) return 'Default'
-    const parts = selectedVariant.options
-      ?.map((o) => o.value)
-      .filter((v) => v && v !== 'ALL')
+    if (!matchingVariant) return 'Default'
+    const parts = matchingVariant.options?.map((o) => o.value).filter((v) => v && v !== 'ALL')
     if (parts && parts.length > 0) return parts.join(' / ')
-    return selectedVariant.title || 'Default'
+    return matchingVariant.title || 'Default'
   }
 
-  const handleAddToCart = useCallback(() => {
-    if (!selectedVariant || !inStock) return
+  const handleAdd = useCallback(() => {
+    if (!matchingVariant || variantSoldOut || !selectedSize) return
     setAdding(true)
     addItem({
-      id: selectedVariant.id,
+      id: matchingVariant.id,
       productId: product.id,
       title: product.title,
       handle: product.handle,
       variant: getVariantLabel(),
       thumbnail: product.thumbnail,
-      price: priceAmount,
+      price,
     })
     setAdded(true)
     toast('Added to bag')
     setTimeout(() => setAdded(false), 5000)
     setAdding(false)
-  }, [selectedVariant, inStock, addItem, product, priceAmount, toast])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [matchingVariant, variantSoldOut, selectedSize, addItem, product, price, toast])
 
-  const category = product.collection?.title
+  const addButtonLabel = allSoldOut
+    ? 'SOLD OUT'
+    : variantSoldOut
+      ? 'SOLD OUT'
+      : adding
+        ? 'ADDING...'
+        : added
+          ? 'ADDED ✓'
+          : !selectedSize
+            ? 'SELECT SIZE'
+            : 'ADD TO BAG'
+
+  const addButtonDisabled = allSoldOut || variantSoldOut || adding || added || !selectedSize
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12">
-      {/* Gallery */}
-      <div className="lg:col-span-7">
-        {/* Mobile: horizontal snap carousel */}
-        <div className="lg:hidden">
-          {images.length > 0 ? (
-            <>
-              <div
-                ref={mobileGalleryRef}
-                className="flex snap-x snap-mandatory overflow-x-auto"
-                style={{ scrollSnapType: 'x mandatory' }}
-              >
-                {images.map((img, i) => (
-                  <div
-                    key={img.id}
-                    className="relative aspect-[3/4] w-full flex-shrink-0 snap-center bg-brand-100"
-                  >
-                    <Image
-                      src={img.url}
-                      alt={product.title}
-                      fill
-                      className="object-cover"
-                      priority={i === 0}
-                      placeholder="blur"
-                      blurDataURL={BLUR_DATA}
-                      sizes="100vw"
-                    />
-                  </div>
-                ))}
-              </div>
-              {images.length > 1 && (
-                <div className="mt-3 flex justify-center gap-2">
-                  {images.map((_, i) => (
-                    <span
-                      key={i}
-                      className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                        i === mobileIndex ? 'bg-brand-950' : 'bg-brand-200'
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex aspect-[3/4] items-center justify-center bg-brand-100">
-              <span className="text-eyebrow text-brand-300">No Image</span>
-            </div>
-          )}
-        </div>
-
-        {/* Desktop: vertical scroll stack, no thumbs */}
-        <div className="hidden lg:block lg:space-y-1">
-          {images.length > 0 ? (
-            images.map((img, i) => (
-              <div key={img.id} className="relative aspect-[3/4] w-full overflow-hidden bg-brand-100">
-                <Image
-                  src={img.url}
-                  alt={product.title}
-                  fill
-                  className="object-cover"
-                  priority={i === 0}
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                  placeholder="blur"
-                  blurDataURL={BLUR_DATA}
-                  sizes="(max-width: 1024px) 100vw, 58vw"
-                />
-              </div>
-            ))
-          ) : (
-            <div className="flex aspect-[3/4] items-center justify-center bg-brand-100">
-              <span className="text-eyebrow text-brand-300">No Image</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Info — sticky on desktop */}
-      <div className="lg:col-span-5">
-        <div className="lg:sticky lg:top-24 lg:self-start lg:pl-8 xl:pl-16 lg:pt-8">
-          {category && <p className="text-eyebrow text-brand-400">{category}</p>}
-          <h1 className="mt-4 font-serif text-display-sm text-brand-950">{product.title}</h1>
-          <p className="mt-4 text-lg text-brand-500">{formatRupiah(priceAmount)}</p>
-
-          {product.subtitle && (
-            <p className="mt-4 text-sm leading-relaxed text-brand-500">{product.subtitle}</p>
-          )}
-
-          {product.options && product.options.length > 0 && (
-            <div className="mt-8">
-              <VariantSelector
-                options={product.options}
-                variants={product.variants}
-                selectedVariant={selectedVariant}
-                onSelect={setSelectedVariant}
+    <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-12 lg:gap-20">
+      {/* Image stack */}
+      <div className="flex flex-col gap-1">
+        {images.length > 0 ? (
+          images.map((img, i) => (
+            <div key={img.id} className="relative aspect-[4/5] bg-ink-900">
+              <Image
+                src={img.url}
+                alt={product.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 1024px) 100vw, 60vw"
+                priority={i === 0}
+                placeholder="blur"
+                blurDataURL={BLUR_DATA}
               />
             </div>
-          )}
-
-          <div className="mt-6">
-            {allSoldOut ? (
-              <div className="flex items-center gap-2 rounded bg-red-50 px-4 py-3">
-                <span className="h-2 w-2 rounded-full bg-red-500" />
-                <span className="text-sm font-medium text-red-700">
-                  Stok Habis — Semua varian tidak tersedia
-                </span>
-              </div>
-            ) : !inStock ? (
-              <div className="flex items-center gap-2 rounded bg-red-50 px-4 py-3">
-                <span className="h-2 w-2 rounded-full bg-red-500" />
-                <span className="text-sm text-red-600">
-                  Varian ini habis — pilih ukuran/warna lain
-                </span>
-              </div>
-            ) : lowStock ? (
-              <div className="flex items-center gap-2 rounded bg-amber-50 px-4 py-3">
-                <span className="h-2 w-2 rounded-full bg-amber-500" />
-                <span className="text-sm text-amber-700">Sisa {variantQty} — Hampir habis!</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="text-sm text-brand-500">Stok tersedia ({variantQty})</span>
-              </div>
-            )}
+          ))
+        ) : (
+          <div className="relative aspect-[4/5] bg-ink-900 flex items-center justify-center">
+            <span className="text-[0.75rem] uppercase tracking-widest text-ink-500">No Image</span>
           </div>
+        )}
+      </div>
 
-          <button
-            onClick={handleAddToCart}
-            disabled={!inStock || adding || added}
-            className={`mt-4 w-full py-4 text-eyebrow transition-all active:scale-[0.98] ${
-              added
-                ? 'bg-brand-800 text-white'
-                : !inStock
-                  ? 'cursor-not-allowed bg-brand-100 text-brand-400'
-                  : 'bg-brand-950 text-white hover:bg-brand-800'
-            }`}
-          >
-            {adding ? 'Menambahkan...' : added ? 'Ditambahkan ✓' : !inStock ? 'Stok Habis' : 'Tambah ke Tas'}
-          </button>
+      {/* Sticky info column */}
+      <div className="lg:sticky lg:top-32 lg:self-start flex flex-col gap-6">
+        {product.collection?.title && (
+          <PillBadge>{product.collection.title}</PillBadge>
+        )}
 
-          <div className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-eyebrow text-brand-400">
-            <span className="flex items-center gap-1">
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-              Secure Payment
-            </span>
-            <span className="flex items-center gap-1">
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.746 3.746 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-              </svg>
-              100% Original
-            </span>
+        <h1 className="text-[clamp(1.5rem,3.5vw,2.5rem)] uppercase font-bold tracking-tighter text-ink-100 leading-[1.05]">
+          {product.title}
+        </h1>
+
+        <p className="text-lg font-bold text-ink-100">{formatRupiah(price)}</p>
+
+        {(product.subtitle || product.description) && (
+          <p className="text-sm text-ink-300 leading-relaxed line-clamp-3">
+            {product.subtitle ?? product.description}
+          </p>
+        )}
+
+        {sizes.length > 0 && (
+          <div>
+            <p className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-3">SIZE</p>
+            <div className="flex flex-wrap gap-2">
+              {sizes.map((size) => {
+                const variantForSize = product.variants.find((v) =>
+                  v.options?.some((o) => o.value === size)
+                )
+                const soldOut = (variantForSize?.inventory_quantity ?? 0) <= 0
+                const active = selectedSize === size
+                return (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    disabled={soldOut}
+                    className={`border px-5 py-2.5 text-sm uppercase font-bold transition-colors ${
+                      active
+                        ? 'border-accent-lime text-accent-lime'
+                        : soldOut
+                          ? 'border-ink-700 text-ink-500 line-through cursor-not-allowed'
+                          : 'border-ink-700 text-ink-100 hover:border-ink-300'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                )
+              })}
+            </div>
           </div>
+        )}
 
-          <div className="mt-10 border-t border-brand-100">
-            <Accordion label="Description" defaultOpen>
-              {product.richDescription && product.richDescription.length > 0 ? (
-                <SanityContent content={product.richDescription} />
-              ) : product.description ? (
-                <p>{product.description}</p>
-              ) : (
-                <p className="text-brand-400">No description available.</p>
-              )}
-            </Accordion>
-            <Accordion label="Materials & Care">
-              <p>Premium fabric, hand-finished. Cold wash, line dry, low iron.</p>
-              {product.weight && <p className="mt-2">Weight: {product.weight}g</p>}
-            </Accordion>
-            <Accordion label="Shipping & Returns">
-              <p>JNE REG / YES — pengiriman seluruh Indonesia.</p>
-              <p>Free shipping min. Rp 300.000.</p>
-              <p>Pengembalian dalam 7 hari dengan tag intact.</p>
-            </Accordion>
-          </div>
+        <button
+          onClick={handleAdd}
+          disabled={addButtonDisabled}
+          className={`w-full py-4 text-sm font-bold uppercase tracking-widest transition-colors ${
+            addButtonDisabled
+              ? 'bg-ink-700 text-ink-500 cursor-not-allowed'
+              : added
+                ? 'bg-ink-700 text-ink-100'
+                : 'bg-accent-lime text-ink-950 hover:bg-ink-50'
+          }`}
+        >
+          {addButtonLabel}
+        </button>
+
+        <div className="flex flex-col mt-4 border-t border-ink-700">
+          <Accordion label="SHIPPING & RETURNS">
+            <p className="text-sm text-ink-300 leading-relaxed">
+              Shipping handled via JNE / J&amp;T / SiCepat across Indonesia.
+              Free returns within 7 days of receipt for unworn items in original packaging.
+            </p>
+          </Accordion>
+          <Accordion label="SIZE GUIDE">
+            <p className="text-sm text-ink-300 leading-relaxed">
+              See the{' '}
+              <a href="/size-guide" className="text-accent-lime underline underline-offset-4">
+                size guide
+              </a>{' '}
+              for chest, length, and sleeve measurements per garment.
+            </p>
+          </Accordion>
+          <Accordion label="MATERIALS">
+            <p className="text-sm text-ink-300 leading-relaxed">
+              Premium cotton fleece, garment-dyed, pre-shrunk. Made in Indonesia.
+              {product.weight ? ` Weight: ${product.weight}g.` : ''}
+            </p>
+          </Accordion>
         </div>
       </div>
     </div>

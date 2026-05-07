@@ -24,16 +24,16 @@ export default function Accordion({ label, children, defaultOpen = false, open, 
   }
 
   return (
-    <div className="border-b border-brand-100">
+    <div className="border-b border-ink-700">
       <button
         type="button"
         onClick={toggle}
         aria-expanded={isOpen}
         aria-controls={id}
-        className="flex w-full items-center justify-between py-5 text-left"
+        className="text-[0.8125rem] font-bold uppercase tracking-[0.18em] text-ink-100 py-4 hover:text-accent-lime w-full text-left flex items-center justify-between transition-colors"
       >
-        <span className="text-eyebrow text-brand-950">{label}</span>
-        <span aria-hidden className="text-brand-400 text-lg leading-none">
+        <span>{label}</span>
+        <span aria-hidden className="text-ink-400 text-lg leading-none">
           {isOpen ? '−' : '+'}
         </span>
       </button>
@@ -43,7 +43,7 @@ export default function Accordion({ label, children, defaultOpen = false, open, 
         data-open={isOpen ? 'true' : 'false'}
       >
         <div>
-          <div className="pb-5 text-sm leading-relaxed text-brand-500">{children}</div>
+          <div className="text-sm text-ink-300 pb-4 leading-relaxed">{children}</div>
         </div>
       </div>
     </div>
