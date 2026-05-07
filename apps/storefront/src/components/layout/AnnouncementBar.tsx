@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'draven_announce_dismissed_v1'
-const MESSAGE = 'FREE SHIPPING ACROSS INDONESIA OVER RP 500.000 · NEW DROP NOW LIVE'
 
 export default function AnnouncementBar() {
   const [visible, setVisible] = useState(false)
