@@ -16,21 +16,7 @@ module.exports = {
         accent: {
           lime: '#c6ff3d',
         },
-        // legacy alias - keeps existing brand-* references compiling
-        // during migration; deleted in Task 21
-        brand: {
-          50:  '#fafafa',
-          100: '#e5e5e5',
-          200: '#262626',
-          300: '#a3a3a3',
-          400: '#737373',
-          500: '#737373',
-          600: '#262626',
-          700: '#262626',
-          800: '#1a1a1a',
-          900: '#111111',
-          950: '#0a0a0a',
-        },
+
       },
       fontFamily: {
         sans: ['var(--font-pp-montreal)', 'Helvetica Neue', 'Arial', 'sans-serif'],

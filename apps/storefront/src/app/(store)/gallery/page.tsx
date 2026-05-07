@@ -37,7 +37,7 @@ function GalleryTile({ item, index }: { item: GalleryItem; index: number }) {
   const src = imageUrl(item.image, w, h)
 
   const inner = (
-    <div className={`group relative overflow-hidden bg-brand-100 ${aspect}`}>
+    <div className={`group relative overflow-hidden bg-ink-100 ${aspect}`}>
       {src ? (
         <Image
           src={src}
@@ -49,7 +49,7 @@ function GalleryTile({ item, index }: { item: GalleryItem; index: number }) {
           blurDataURL={BLUR_DATA}
         />
       ) : (
-        <div className="flex h-full w-full items-center justify-center text-eyebrow text-brand-300">
+        <div className="flex h-full w-full items-center justify-center text-eyebrow text-ink-300">
           No Image
         </div>
       )}
@@ -95,21 +95,21 @@ export default async function GalleryPage() {
   return (
     <section className="mx-auto max-w-container px-5 py-20 lg:px-8 lg:py-32">
       <header className="mb-12 max-w-2xl lg:mb-20">
-        <p className="text-eyebrow text-brand-400">Gallery</p>
-        <h1 className="mt-4 font-serif text-display text-brand-950">
+        <p className="text-eyebrow text-ink-500">Gallery</p>
+        <h1 className="mt-4 font-serif text-display text-ink-950">
           Worn by the community.
         </h1>
-        <p className="mt-6 max-w-md text-sm leading-relaxed text-brand-500">
+        <p className="mt-6 max-w-md text-sm leading-relaxed text-ink-500">
           Foto pilihan dari pelanggan dan kreator yang memakai DRAVEN.
-          Tag <span className="text-brand-950">@dravenworldwide</span> di Instagram untuk
+          Tag <span className="text-ink-950">@dravenworldwide</span> di Instagram untuk
           masuk ke galeri berikutnya.
         </p>
       </header>
 
       {items.length === 0 ? (
-        <div className="border border-dashed border-brand-200 px-8 py-20 text-center">
-          <p className="text-eyebrow text-brand-400">Coming soon</p>
-          <p className="mt-4 text-sm text-brand-500">
+        <div className="border border-dashed border-ink-700 px-8 py-20 text-center">
+          <p className="text-eyebrow text-ink-500">Coming soon</p>
+          <p className="mt-4 text-sm text-ink-500">
             Belum ada foto galeri. Tambahkan dari Sanity Studio &rarr; Galeri.
           </p>
         </div>

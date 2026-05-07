@@ -82,7 +82,7 @@ export default function SearchOverlay({
       <div className="flex h-14 items-center justify-end px-5">
         <button
           onClick={handleClose}
-          className="text-brand-950 transition-opacity hover:opacity-50"
+          className="text-ink-950 transition-opacity hover:opacity-50"
           aria-label="Close search"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -106,7 +106,7 @@ export default function SearchOverlay({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="SEARCH"
-            className="w-full border-b border-brand-950 bg-transparent pb-3 text-2xl font-medium uppercase tracking-widest text-brand-950 placeholder-brand-300 outline-none"
+            className="w-full border-b border-ink-950 bg-transparent pb-3 text-2xl font-medium uppercase tracking-widest text-ink-950 placeholder-ink-300 outline-none"
             autoFocus
           />
         </form>
@@ -114,23 +114,23 @@ export default function SearchOverlay({
         <div className="mt-6">
           {searching && (
             <div className="flex items-center gap-2 py-4">
-              <div className="h-4 w-4 animate-spin border-2 border-brand-950 border-t-transparent" />
-              <span className="text-sm text-brand-400">Searching...</span>
+              <div className="h-4 w-4 animate-spin border-2 border-ink-950 border-t-transparent" />
+              <span className="text-sm text-ink-500">Searching...</span>
             </div>
           )}
 
           {!searching && searched && results.length === 0 && (
-            <p className="py-4 text-sm text-brand-400">
+            <p className="py-4 text-sm text-ink-500">
               No results found for &ldquo;{searchQuery}&rdquo;
             </p>
           )}
 
           {!searching && results.length > 0 && (
             <>
-              <p className="text-[11px] uppercase tracking-widest text-brand-400">
+              <p className="text-[11px] uppercase tracking-widest text-ink-500">
                 {results.length} result{results.length !== 1 ? 's' : ''} for &ldquo;{searchQuery}&rdquo;
               </p>
-              <div className="mt-4 divide-y divide-brand-100">
+              <div className="mt-4 divide-y divide-ink-100">
                 {results.map((item) => (
                   <Link
                     key={item.id}
@@ -138,18 +138,18 @@ export default function SearchOverlay({
                     onClick={handleClose}
                     className="flex items-center gap-4 py-3 transition-opacity hover:opacity-60"
                   >
-                    <div className="relative h-14 w-11 flex-shrink-0 overflow-hidden bg-brand-50">
+                    <div className="relative h-14 w-11 flex-shrink-0 overflow-hidden bg-ink-50">
                       {item.thumbnail ? (
                         <Image src={item.thumbnail} alt={item.title} fill className="object-cover" sizes="44px" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
-                          <span className="text-[7px] uppercase tracking-widest text-brand-300">No img</span>
+                          <span className="text-[7px] uppercase tracking-widest text-ink-300">No img</span>
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="truncate text-sm font-medium text-brand-950">{item.title}</p>
-                      <p className="text-xs text-brand-400">
+                      <p className="truncate text-sm font-medium text-ink-950">{item.title}</p>
+                      <p className="text-xs text-ink-500">
                         {item.variants?.[0]?.prices?.[0]
                           ? formatRupiah(item.variants[0].prices[0].amount)
                           : ''}
@@ -161,7 +161,7 @@ export default function SearchOverlay({
               <Link
                 href={`/products?q=${encodeURIComponent(searchQuery)}`}
                 onClick={handleClose}
-                className="mt-4 block text-center text-[11px] uppercase tracking-widest text-brand-400 transition-colors hover:text-brand-950"
+                className="mt-4 block text-center text-[11px] uppercase tracking-widest text-ink-500 transition-colors hover:text-ink-950"
               >
                 View all results
               </Link>

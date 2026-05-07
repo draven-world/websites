@@ -40,10 +40,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             key={t.id}
             className={`animate-slide-up flex items-center gap-2 px-5 py-3 text-sm font-medium text-white shadow-lg ${
               t.type === 'success'
-                ? 'bg-brand-900'
+                ? 'bg-ink-900'
                 : t.type === 'error'
                   ? 'bg-red-600'
-                  : 'bg-brand-700'
+                  : 'bg-ink-700'
             }`}
           >
             {t.type === 'success' && (

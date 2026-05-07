@@ -44,8 +44,8 @@ export default function VariantSelector({ options, variants, selectedVariant, on
 
         return (
           <div key={option.id}>
-            <label className="mb-2.5 block text-sm font-bold text-brand-900">
-              {option.title}: <span className="font-normal text-brand-500">{selectedValues[optionIndex]}</span>
+            <label className="mb-2.5 block text-sm font-bold text-ink-900">
+              {option.title}: <span className="font-normal text-ink-500">{selectedValues[optionIndex]}</span>
             </label>
             <div className="flex flex-wrap gap-2">
               {uniqueValues.map((value) => {
@@ -63,10 +63,10 @@ export default function VariantSelector({ options, variants, selectedVariant, on
                     disabled={!hasStock}
                     className={`border px-5 py-2.5 text-[13px] font-medium transition-colors ${
                       isSelected
-                        ? 'border-brand-900 bg-brand-900 text-white'
+                        ? 'border-ink-900 bg-ink-900 text-white'
                         : hasStock
-                          ? 'border-brand-200 text-brand-700 hover:border-brand-900'
-                          : 'border-brand-100 text-brand-300 cursor-not-allowed line-through'
+                          ? 'border-ink-700 text-ink-700 hover:border-ink-900'
+                          : 'border-ink-100 text-ink-300 cursor-not-allowed line-through'
                     }`}
                   >
                     {value}
