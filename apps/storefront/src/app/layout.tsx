@@ -1,6 +1,21 @@
 import type { Metadata } from 'next'
+import { Bebas_Neue, Barlow } from 'next/font/google'
 import Script from 'next/script'
 import { CartProvider } from '@/providers/cart-provider'
+
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-pp-machina',
+  display: 'swap',
+})
+
+const barlow = Barlow({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-pp-montreal',
+  display: 'swap',
+})
 import { AuthProvider } from '@/providers/auth-provider'
 import { ToastProvider } from '@/providers/toast-provider'
 import AnnouncementBar from '@/components/layout/AnnouncementBar'
@@ -31,7 +46,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${bebasNeue.variable} ${barlow.variable}`}>
       <body className="bg-ink-950 text-ink-100 antialiased">
         <AnnouncementBar />
         <AuthProvider>
