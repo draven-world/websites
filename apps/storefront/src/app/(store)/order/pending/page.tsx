@@ -20,7 +20,6 @@ function PendingContent() {
 
       if (data.status === 'paid') {
         setStatus('paid')
-        // Update local order if user is logged in
         updateLocalOrderStatus(orderId, 'paid')
         setTimeout(() => router.push(`/order/success?id=${orderId}`), 1500)
       } else if (data.status === 'failed') {
@@ -46,114 +45,96 @@ function PendingContent() {
   }, [orderId, checkStatus])
 
   return (
-    <div className="mx-auto max-w-md px-5 py-32 text-center">
-      {status === 'paid' ? (
-        <>
-          <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center bg-brand-950">
-            <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
-            Payment Confirmed
-          </h1>
-          <p className="mt-4 text-sm text-brand-400">Redirecting...</p>
-        </>
-      ) : status === 'expired' ? (
-        <>
-          <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center border border-brand-300">
-            <svg className="h-6 w-6 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
-            Payment Expired
-          </h1>
-          {orderId && <p className="mt-3 font-mono text-sm text-brand-400">{orderId}</p>}
-          <p className="mt-4 text-sm text-brand-400">
-            The payment deadline has passed. Please place a new order.
-          </p>
-          <div className="mt-12 flex flex-col gap-4">
-            <Link href="/products" className="btn-primary py-4">
-              Shop Again
-            </Link>
-          </div>
-        </>
-      ) : status === 'failed' ? (
-        <>
-          <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center border border-red-300">
-            <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
-            Payment Failed
-          </h1>
-          {orderId && <p className="mt-3 font-mono text-sm text-brand-400">{orderId}</p>}
-          <p className="mt-4 text-sm text-brand-400">
-            Your payment could not be processed. Please try again.
-          </p>
-          <div className="mt-12 flex flex-col gap-4">
-            <Link href="/products" className="btn-primary py-4">
-              Back to Shop
-            </Link>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="mx-auto mb-8 flex h-14 w-14 items-center justify-center border border-brand-950">
-            <svg className="h-6 w-6 text-brand-950 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
+    <div className="min-h-screen flex items-center justify-center px-8">
+      <div className="w-full max-w-md text-center">
+        {status === 'paid' ? (
+          <>
+            <h1 className="text-[clamp(1.5rem,3.5vw,2.5rem)] uppercase font-bold tracking-tighter text-ink-100 leading-[1.05]">
+              PAYMENT CONFIRMED
+            </h1>
+            {orderId && <p className="mt-4 text-sm text-ink-300">Order #{orderId}</p>}
+            <p className="mt-4 text-[0.75rem] uppercase tracking-[0.15em] text-ink-500">
+              REDIRECTING…
+            </p>
+          </>
+        ) : status === 'expired' ? (
+          <>
+            <h1 className="text-[clamp(1.5rem,3.5vw,2.5rem)] uppercase font-bold tracking-tighter text-ink-100 leading-[1.05]">
+              PAYMENT EXPIRED
+            </h1>
+            {orderId && <p className="mt-4 text-sm text-ink-300">Order #{orderId}</p>}
+            <p className="mt-3 text-[0.75rem] uppercase tracking-[0.15em] text-ink-500">
+              BATAS WAKTU PEMBAYARAN TELAH BERLALU. SILAKAN BUAT PESANAN BARU.
+            </p>
+            <div className="mt-12">
+              <Link href="/products" className="btn-primary inline-flex">
+                SHOP AGAIN
+              </Link>
+            </div>
+          </>
+        ) : status === 'failed' ? (
+          <>
+            <h1 className="text-[clamp(1.5rem,3.5vw,2.5rem)] uppercase font-bold tracking-tighter text-ink-100 leading-[1.05]">
+              PAYMENT FAILED
+            </h1>
+            {orderId && <p className="mt-4 text-sm text-ink-300">Order #{orderId}</p>}
+            <p className="mt-3 text-[0.75rem] uppercase tracking-[0.15em] text-ink-500">
+              PEMBAYARAN GAGAL DIPROSES. SILAKAN COBA LAGI.
+            </p>
+            <div className="mt-12">
+              <Link href="/products" className="btn-primary inline-flex">
+                BACK TO SHOP
+              </Link>
+            </div>
+          </>
+        ) : (
+          <>
+            <h1 className="text-[clamp(1.5rem,3.5vw,2.5rem)] uppercase font-bold tracking-tighter text-ink-100 leading-[1.05]">
+              PAYMENT PENDING
+            </h1>
+            {orderId && <p className="mt-4 text-sm text-ink-300">Order #{orderId}</p>}
+            <p className="mt-3 text-[0.75rem] uppercase tracking-[0.15em] text-ink-500">
+              PESANAN TELAH DIBUAT. SELESAIKAN PEMBAYARAN SEBELUM BATAS WAKTU.
+            </p>
+            <p className="mt-2 text-[0.75rem] uppercase tracking-[0.15em] text-ink-500">
+              KONFIRMASI AKAN DIKIRIM VIA WHATSAPP.
+            </p>
 
-          <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
-            Awaiting Payment
-          </h1>
+            <div className="mt-6 flex items-center justify-center gap-2 text-[0.75rem] uppercase tracking-[0.15em] text-ink-400">
+              {checking ? (
+                <>
+                  <div className="h-3 w-3 animate-spin border border-ink-400 border-t-transparent rounded-full" />
+                  CHECKING STATUS…
+                </>
+              ) : (
+                <>
+                  <div className="h-1.5 w-1.5 rounded-full bg-ink-500 animate-pulse" />
+                  AUTO-CHECK EVERY 10 SECONDS
+                </>
+              )}
+            </div>
 
-          {orderId && <p className="mt-3 font-mono text-sm text-brand-400">{orderId}</p>}
-
-          <p className="mt-4 text-sm leading-relaxed text-brand-400">
-            Your order has been created. Please complete payment before the deadline.
-          </p>
-          <p className="mt-2 text-sm text-brand-400">
-            Once confirmed, you&apos;ll receive a WhatsApp notification.
-          </p>
-
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-brand-400">
-            {checking ? (
-              <>
-                <div className="h-3 w-3 animate-spin border border-brand-400 border-t-transparent rounded-full" />
-                Checking payment status...
-              </>
-            ) : (
-              <>
-                <div className="h-1.5 w-1.5 rounded-full bg-brand-300 animate-pulse" />
-                Auto-checking every 10 seconds
-              </>
-            )}
-          </div>
-
-          <div className="mt-12 flex flex-col gap-4">
-            <button
-              onClick={checkStatus}
-              disabled={checking}
-              className="btn-primary py-4"
-            >
-              {checking ? 'Checking...' : 'Check Status Now'}
-            </button>
-            <Link href="/products" className="btn-secondary py-4">
-              Continue Shopping
-            </Link>
-            <Link
-              href="/account/orders"
-              className="text-[11px] uppercase tracking-widest text-brand-400 transition-colors hover:text-brand-950"
-            >
-              View Orders
-            </Link>
-          </div>
-        </>
-      )}
+            <div className="mt-12 flex flex-col gap-4 items-center">
+              <button
+                onClick={checkStatus}
+                disabled={checking}
+                className="btn-primary w-full"
+              >
+                {checking ? 'CHECKING…' : 'CHECK STATUS NOW'}
+              </button>
+              <Link href="/products" className="btn-ghost w-full">
+                CONTINUE SHOPPING
+              </Link>
+              <Link
+                href="/account/orders"
+                className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-400 hover:text-accent-lime transition-colors"
+              >
+                VIEW ORDERS →
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -171,13 +152,13 @@ function updateLocalOrderStatus(orderId: string, status: string) {
     const usersRaw = localStorage.getItem('draven_users')
     if (!usersRaw) return
     const users = JSON.parse(usersRaw)
-    const user = users.find((u: any) => u.email === sessionEmail)
+    const user = users.find((u: { email: string }) => u.email === sessionEmail)
     if (!user) return
     const key = `draven_orders_${user.id}`
     const ordersRaw = localStorage.getItem(key)
     if (!ordersRaw) return
     const orders = JSON.parse(ordersRaw)
-    const order = orders.find((o: any) => o.id === orderId)
+    const order = orders.find((o: { id: string }) => o.id === orderId)
     if (order) {
       order.status = status
       localStorage.setItem(key, JSON.stringify(orders))
@@ -189,11 +170,13 @@ function updateLocalOrderStatus(orderId: string, status: string) {
 
 export default function OrderPendingPage() {
   return (
-    <Suspense fallback={
-      <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="h-5 w-5 animate-spin border-2 border-ink-100 border-t-transparent" />
+        </div>
+      }
+    >
       <PendingContent />
     </Suspense>
   )
