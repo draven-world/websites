@@ -50,7 +50,7 @@ export default function HeroSilent({
       <div className="relative z-10 flex h-full items-center justify-center">
         <Link
           href="/products"
-          className="text-[clamp(2rem,5vw,4rem)] uppercase font-bold text-ink-100 tracking-tighter leading-none animate-breathe motion-reduce:animate-none"
+          className="font-display text-[clamp(2rem,5vw,4rem)] uppercase font-bold text-ink-100 tracking-tighter leading-none animate-breathe motion-reduce:animate-none"
         >
           SHOP HERE
         </Link>

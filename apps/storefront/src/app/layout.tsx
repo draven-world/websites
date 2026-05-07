@@ -47,7 +47,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${bebasNeue.variable} ${barlow.variable}`}>
-      <body className="bg-ink-950 text-ink-100 antialiased">
+      <body className="font-sans bg-ink-950 text-ink-100 antialiased">
         <AnnouncementBar />
         <AuthProvider>
           <CartProvider>
