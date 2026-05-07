@@ -1,8 +1,7 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/providers/auth-provider'
 import { formatRupiah } from '@/lib/utils'
 
@@ -13,7 +12,7 @@ export default function OrdersPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
+        <div className="h-5 w-5 animate-spin border-2 border-ink-100 border-t-transparent" />
       </div>
     )
   }
@@ -24,84 +23,52 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-container px-5 py-10 lg:px-8 lg:py-16">
-      <div className="flex items-baseline gap-3">
-        <Link
-          href="/account"
-          className="text-[11px] uppercase tracking-widest text-brand-400 transition-colors hover:text-brand-950"
-        >
-          Account
-        </Link>
-        <span className="text-brand-300">/</span>
-        <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
-          Orders
-        </h1>
-      </div>
+    <div className="mx-auto max-w-2xl px-8 pt-32 lg:pt-40 pb-32">
+      <h1 className="text-[clamp(2rem,5vw,4rem)] uppercase font-bold tracking-tighter text-ink-100 leading-none">ORDERS</h1>
+      <p className="mt-2 text-[0.75rem] uppercase tracking-[0.15em] text-ink-500">
+        {orders.length} ORDER{orders.length !== 1 ? 'S' : ''}
+      </p>
 
-      {orders.length > 0 ? (
-        <div className="mt-10 space-y-6">
+      {orders.length === 0 ? (
+        <div className="mt-16">
+          <p className="text-sm text-ink-300">No orders yet.</p>
+          <Link
+            href="/products"
+            className="mt-6 inline-block text-[0.8125rem] uppercase tracking-[0.18em] text-ink-300 hover:text-accent-lime transition-colors"
+          >
+            START SHOPPING →
+          </Link>
+        </div>
+      ) : (
+        <div className="mt-12 border-t border-ink-700">
           {orders.map((order) => (
-            <div key={order.id} className="border-t border-brand-200 pt-6">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-brand-950">{order.id}</p>
-                  <p className="mt-1 text-xs text-brand-400">
-                    {new Date(order.created_at).toLocaleDateString('id-ID', {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-brand-950">{formatRupiah(order.total)}</p>
-                  <span className={`mt-1 inline-block text-[10px] uppercase tracking-widest ${
-                    order.status === 'delivered' ? 'text-green-600' :
-                    order.status === 'shipped' ? 'text-blue-600' :
-                    order.status === 'paid' || order.status === 'processing' ? 'text-brand-950' :
-                    'text-brand-400'
-                  }`}>
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-
-              {/* Items */}
-              <div className="mt-4 space-y-3">
+            <details key={order.id} className="border-b border-ink-700 py-4">
+              <summary className="cursor-pointer grid grid-cols-[1fr_auto_auto_auto] gap-4 items-center text-sm">
+                <span className="font-bold text-ink-100">#{order.id}</span>
+                <span className="text-ink-300">
+                  {new Date(order.created_at).toLocaleDateString('en-US')}
+                </span>
+                <span className={`text-[0.75rem] uppercase tracking-[0.15em] ${
+                  order.status === 'delivered' || order.status === 'paid'
+                    ? 'text-accent-lime'
+                    : order.status === 'shipped' || order.status === 'processing'
+                    ? 'text-ink-100'
+                    : 'text-ink-500'
+                }`}>
+                  {order.status.toUpperCase()}
+                </span>
+                <span className="font-bold text-ink-100">{formatRupiah(order.total)}</span>
+              </summary>
+              <div className="mt-4 flex flex-col gap-2 text-sm text-ink-300">
                 {order.items.map((item, i) => (
-                  <div key={i} className="flex gap-3">
-                    <div className="relative h-14 w-10 flex-shrink-0 overflow-hidden bg-brand-100">
-                      {item.thumbnail ? (
-                        <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center">
-                          <span className="text-[7px] uppercase tracking-widest text-brand-300">IMG</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="truncate text-sm text-brand-950">{item.title}</p>
-                      <p className="text-xs text-brand-400">{item.variant} × {item.quantity}</p>
-                    </div>
-                    <p className="text-sm text-brand-950">{formatRupiah(item.price * item.quantity)}</p>
+                  <div key={i} className="flex justify-between">
+                    <span>{item.title} × {item.quantity}</span>
+                    <span>{formatRupiah(item.price * item.quantity)}</span>
                   </div>
                 ))}
               </div>
-
-              {/* Shipping Info */}
-              <div className="mt-4 text-xs text-brand-400">
-                <p>{order.shipping_method} · {order.shipping_address.city}, {order.shipping_address.province}</p>
-              </div>
-            </div>
+            </details>
           ))}
-        </div>
-      ) : (
-        <div className="py-24 text-center">
-          <p className="text-sm text-brand-400">No orders yet</p>
-          <Link href="/products" className="btn-primary mt-6 inline-flex">
-            Start Shopping
-          </Link>
         </div>
       )}
     </div>
