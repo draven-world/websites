@@ -27,9 +27,9 @@ export default async function StaticPage({ params }: Props) {
   if (!page) notFound()
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="mb-8 text-3xl font-bold text-gray-900">{page.title}</h1>
+    <article className="mx-auto max-w-2xl px-8 pt-32 lg:pt-40 pb-32">
+      <h1 className="text-[clamp(2rem,5vw,4rem)] uppercase font-bold tracking-tighter text-ink-100 leading-none mb-12">{page.title}</h1>
       <SanityContent content={page.content} />
-    </div>
+    </article>
   )
 }

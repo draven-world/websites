@@ -47,14 +47,9 @@ export default async function FaqPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-12 lg:py-16">
-      <h1 className="text-2xl font-bold uppercase tracking-wide text-brand-900">FAQ</h1>
-      <p className="mt-2 text-sm text-brand-400">
-        Pertanyaan yang sering diajukan seputar Draven Store
-      </p>
-      <div className="mt-10">
-        <FaqList faqs={faqs} />
-      </div>
+    <div className="mx-auto max-w-2xl px-8 pt-32 lg:pt-40 pb-32">
+      <h1 className="text-[clamp(2rem,5vw,4rem)] uppercase font-bold tracking-tighter text-ink-100 leading-none mb-12">FAQ</h1>
+      <FaqList faqs={faqs} />
     </div>
   )
 }

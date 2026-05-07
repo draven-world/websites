@@ -22,8 +22,9 @@
   },
   "devDependencies": {
     "@draven/eslint-config": "workspace:*",
-    "@draven/tsconfig": "workspace:*",
     "@draven/tailwind-config": "workspace:*",
+    "@draven/tsconfig": "workspace:*",
+    "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^20.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

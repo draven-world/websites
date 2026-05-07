@@ -27,13 +27,13 @@ export default function FaqList({ faqs }: { faqs: Faq[] }) {
   return (
     <div>
       {/* Category Filter */}
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="mb-8 flex flex-wrap gap-2">
         <button
           onClick={() => setActiveCategory('all')}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-full px-4 py-1.5 text-[0.75rem] uppercase tracking-[0.12em] font-medium transition-colors ${
             activeCategory === 'all'
-              ? 'bg-brand-600 text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ? 'bg-ink-100 text-ink-900'
+              : 'bg-ink-800 text-ink-400 hover:bg-ink-700 hover:text-ink-200'
           }`}
         >
           Semua
@@ -42,10 +42,10 @@ export default function FaqList({ faqs }: { faqs: Faq[] }) {
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-full px-4 py-1.5 text-[0.75rem] uppercase tracking-[0.12em] font-medium transition-colors ${
               activeCategory === cat
-                ? 'bg-brand-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ? 'bg-ink-100 text-ink-900'
+                : 'bg-ink-800 text-ink-400 hover:bg-ink-700 hover:text-ink-200'
             }`}
           >
             {categoryLabels[cat] || cat}
@@ -54,18 +54,19 @@ export default function FaqList({ faqs }: { faqs: Faq[] }) {
       </div>
 
       {/* FAQ Accordion */}
-      <div className="divide-y divide-gray-200 rounded-xl border border-gray-200">
+      <div>
         {filtered.map((faq, i) => {
           const isOpen = openIndex === i
+          const isLast = i === filtered.length - 1
           return (
-            <div key={i}>
+            <div key={i} className={`border-t border-ink-700 ${isLast ? 'border-b' : ''}`}>
               <button
                 onClick={() => setOpenIndex(isOpen ? null : i)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left"
+                className="text-[0.8125rem] uppercase tracking-[0.18em] text-ink-100 hover:text-accent-lime w-full text-left py-4 flex items-center justify-between transition-colors"
               >
-                <span className="pr-4 text-sm font-medium text-gray-900">{faq.question}</span>
+                <span className="pr-4">{faq.question}</span>
                 <svg
-                  className={`h-5 w-5 flex-shrink-0 text-gray-400 transition-transform ${
+                  className={`h-4 w-4 flex-shrink-0 transition-transform ${
                     isOpen ? 'rotate-180' : ''
                   }`}
                   fill="none"
@@ -76,7 +77,7 @@ export default function FaqList({ faqs }: { faqs: Faq[] }) {
                 </svg>
               </button>
               {isOpen && (
-                <div className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{faq.answer}</div>
+                <div className="text-sm text-ink-300 mt-3 leading-relaxed pb-4">{faq.answer}</div>
               )}
             </div>
           )
