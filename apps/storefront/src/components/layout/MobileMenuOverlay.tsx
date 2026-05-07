@@ -36,10 +36,10 @@ export default function MobileMenuOverlay({
   return (
     <div className="fixed inset-0 z-[60] bg-ink-950 lg:hidden overflow-y-auto">
       <div className="flex h-14 items-center justify-between px-5">
-        <span className="text-[0.8125rem] uppercase tracking-[0.18em] text-ink-300">MENU</span>
+        <span className="text-[0.8125rem] font-black uppercase tracking-[0.18em] text-ink-300">MENU</span>
         <button
           onClick={onClose}
-          className="text-[0.8125rem] font-bold uppercase tracking-[0.18em] text-ink-100"
+          className="text-[0.8125rem] font-black uppercase tracking-[0.18em] text-ink-100"
           aria-label="Close menu"
         >
           CLOSE
@@ -56,7 +56,7 @@ export default function MobileMenuOverlay({
             value={searchQ}
             onChange={(e) => setSearchQ(e.target.value)}
             placeholder="SEARCH"
-            className="w-full border-b border-ink-700 bg-transparent pb-3 text-lg font-bold uppercase tracking-[0.18em] text-ink-100 placeholder-ink-500 outline-none focus:border-accent-lime transition-colors"
+            className="w-full border-b border-ink-700 bg-transparent pb-3 text-lg font-black uppercase tracking-[0.18em] text-ink-100 placeholder-ink-500 outline-none focus:border-accent-lime transition-colors"
           />
         </form>
       </div>
@@ -67,7 +67,7 @@ export default function MobileMenuOverlay({
             key={item.href}
             href={item.href}
             onClick={onClose}
-            className="border-b border-ink-700 px-5 py-5 text-[clamp(1.5rem,3.5vw,2.5rem)] font-bold uppercase tracking-tighter text-ink-100 transition-opacity hover:opacity-60"
+            className="border-b border-ink-700 px-5 py-5 text-[clamp(1.5rem,3.5vw,2.5rem)] font-black uppercase tracking-tighter text-ink-100 transition-opacity hover:opacity-60"
           >
             {item.label}
           </Link>
@@ -76,7 +76,7 @@ export default function MobileMenuOverlay({
           <Link
             href="/account"
             onClick={onClose}
-            className="border-b border-ink-700 px-5 py-5 text-[clamp(1.5rem,3.5vw,2.5rem)] font-bold uppercase tracking-tighter text-ink-100 transition-opacity hover:opacity-60"
+            className="border-b border-ink-700 px-5 py-5 text-[clamp(1.5rem,3.5vw,2.5rem)] font-black uppercase tracking-tighter text-ink-100 transition-opacity hover:opacity-60"
           >
             ACCOUNT
           </Link>
@@ -84,7 +84,7 @@ export default function MobileMenuOverlay({
           <Link
             href="/register"
             onClick={onClose}
-            className="border-b border-ink-700 px-5 py-5 text-[clamp(1.5rem,3.5vw,2.5rem)] font-bold uppercase tracking-tighter text-ink-100 transition-opacity hover:opacity-60"
+            className="border-b border-ink-700 px-5 py-5 text-[clamp(1.5rem,3.5vw,2.5rem)] font-black uppercase tracking-tighter text-ink-100 transition-opacity hover:opacity-60"
           >
             SIGN UP
           </Link>

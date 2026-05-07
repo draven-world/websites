@@ -11,14 +11,13 @@ const bebasNeue = Bebas_Neue({
 })
 
 const barlow = Barlow({
-  weight: ['400', '500', '700'],
+  weight: ['400', '500', '700', '900'],
   subsets: ['latin'],
   variable: '--font-pp-montreal',
   display: 'swap',
 })
 import { AuthProvider } from '@/providers/auth-provider'
 import { ToastProvider } from '@/providers/toast-provider'
-import AnnouncementBar from '@/components/layout/AnnouncementBar'
 import './globals.css'
 
 const MIDTRANS_CLIENT_KEY = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
@@ -48,7 +47,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bebasNeue.variable} ${barlow.variable}`}>
       <body className="font-sans bg-ink-950 text-ink-100 antialiased">
-        <AnnouncementBar />
         <AuthProvider>
           <CartProvider>
             <ToastProvider>{children}</ToastProvider>

@@ -59,14 +59,14 @@ export default function SiteChrome() {
       <div className="hidden lg:flex fixed top-8 right-8 z-50 items-center gap-5">
         <button
           onClick={() => setSearchOpen(true)}
-          className="text-[0.8125rem] font-bold uppercase tracking-[0.18em] text-ink-100 transition-opacity hover:opacity-60"
+          className="text-[0.8125rem] font-black uppercase tracking-[0.18em] text-ink-100 transition-opacity hover:opacity-60"
           aria-label="Open search"
         >
           SEARCH
         </button>
         <Link
           href="/cart"
-          className="text-[0.8125rem] font-bold uppercase tracking-[0.18em] text-ink-100 transition-opacity hover:opacity-60"
+          className="text-[0.8125rem] font-black uppercase tracking-[0.18em] text-ink-100 transition-opacity hover:opacity-60"
           aria-label={`Bag, ${totalItems} items`}
         >
           BAG<sup className={`ml-0.5 text-[10px] ${bagBounce ? 'animate-badge-bounce inline-block' : ''}`}>{totalItems}</sup>
@@ -77,14 +77,14 @@ export default function SiteChrome() {
       <div className="flex lg:hidden fixed top-5 right-5 z-50 items-center gap-4">
         <button
           onClick={() => setMenuOpen(true)}
-          className="text-[0.8125rem] font-bold uppercase tracking-[0.18em] text-ink-100"
+          className="text-[0.8125rem] font-black uppercase tracking-[0.18em] text-ink-100"
           aria-label="Open menu"
         >
           MENU
         </button>
         <Link
           href="/cart"
-          className="text-[0.8125rem] font-bold uppercase tracking-[0.18em] text-ink-100"
+          className="text-[0.8125rem] font-black uppercase tracking-[0.18em] text-ink-100"
           aria-label={`Bag, ${totalItems} items`}
         >
           BAG<sup className={`ml-0.5 text-[10px] ${bagBounce ? 'animate-badge-bounce inline-block' : ''}`}>{totalItems}</sup>
@@ -99,7 +99,7 @@ export default function SiteChrome() {
             <Link
               key={item.href}
               href={item.href}
-              className={`text-[0.8125rem] font-bold uppercase tracking-[0.18em] transition-opacity hover:opacity-60 ${
+              className={`text-[0.8125rem] font-black uppercase tracking-[0.18em] transition-opacity hover:opacity-60 ${
                 active ? 'text-accent-lime' : 'text-ink-100'
               }`}
             >
@@ -110,7 +110,7 @@ export default function SiteChrome() {
         {user ? (
           <Link
             href="/account"
-            className={`text-[0.8125rem] font-bold uppercase tracking-[0.18em] transition-opacity hover:opacity-60 ${
+            className={`text-[0.8125rem] font-black uppercase tracking-[0.18em] transition-opacity hover:opacity-60 ${
               pathname === '/account' ? 'text-accent-lime' : 'text-ink-100'
             }`}
           >
@@ -119,7 +119,7 @@ export default function SiteChrome() {
         ) : (
           <Link
             href="/register"
-            className={`text-[0.8125rem] font-bold uppercase tracking-[0.18em] transition-opacity hover:opacity-60 ${
+            className={`text-[0.8125rem] font-black uppercase tracking-[0.18em] transition-opacity hover:opacity-60 ${
               pathname === '/register' ? 'text-accent-lime' : 'text-ink-100'
             }`}
           >
