@@ -1,8 +1,8 @@
 import { Suspense } from 'react'
 import { getProducts } from '@/lib/medusa'
 import ProductCard from '@/components/product/ProductCard'
-import ProductFilters, { SortDropdown } from '@/components/product/ProductFilters'
-import MobileFilterButton from '@/components/product/MobileFilterButton'
+import FilterTrigger from '@/components/product/FilterTrigger'
+import SortDropdown from '@/components/product/SortDropdown'
 
 export const revalidate = 0
 
@@ -123,68 +123,43 @@ export default async function ProductsPage({
   }
 
   return (
-    <div className="mx-auto max-w-container px-5 py-10 lg:px-8 lg:py-16">
-      <div className="flex gap-12">
-        {/* Sidebar — Desktop */}
-        <div className="hidden w-[220px] flex-shrink-0 lg:block">
+    <div className="px-8 lg:px-16 pt-32 lg:pt-40 pb-32">
+      <div className="flex items-end justify-between mb-12 border-b border-ink-700 pb-6">
+        <div>
+          <h1 className="text-[clamp(2rem,5vw,4rem)] uppercase font-bold tracking-tighter text-ink-100 leading-none">
+            {pageTitle}
+          </h1>
+        </div>
+        <div className="flex items-center gap-6 text-[0.75rem] uppercase tracking-[0.15em] text-ink-300">
+          <span>{products.length} PIECES</span>
           <Suspense>
-            <ProductFilters productCount={products.length} availableColors={availableColors} />
+            <FilterTrigger productCount={products.length} availableColors={availableColors} />
+          </Suspense>
+          <Suspense>
+            <SortDropdown />
           </Suspense>
         </div>
+      </div>
 
-        {/* Main */}
-        <div className="flex-1">
-          {/* Header */}
-          <div className="mb-10 flex items-end justify-between">
-            <div>
-              <h1 className="text-3xl font-medium tracking-tightest text-brand-950 md:text-4xl">
-                {pageTitle}
-              </h1>
-              <p className="mt-1 text-sm text-brand-400">
-                {products.length} produk
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              {/* Mobile filter button */}
-              <Suspense>
-                <MobileFilterButton
-                  activeCount={activeFilterCount}
-                  productCount={products.length}
-                  availableColors={availableColors}
-                />
-              </Suspense>
-              {/* Desktop sort */}
-              <div className="hidden lg:block">
-                <Suspense>
-                  <SortDropdown />
-                </Suspense>
-              </div>
-            </div>
-          </div>
-
-          {products.length > 0 ? (
-            <div className="grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 md:gap-x-5 md:gap-y-14">
-              {products.map((product: any) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          ) : (
-            <div className="py-24 text-center">
-              <p className="text-sm text-brand-400">
-                Tidak ada produk ditemukan.
-              </p>
-              {activeFilterCount > 0 && (
-                <a
-                  href="/products"
-                  className="mt-4 inline-block text-[11px] uppercase tracking-widest text-brand-950 underline underline-offset-4"
-                >
-                  Reset Filter
-                </a>
-              )}
-            </div>
+      {products.length > 0 ? (
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-12 md:gap-x-24 lg:gap-x-32 gap-y-24 lg:gap-y-32">
+          {products.map((product: any, i: number) => (
+            <ProductCard key={product.id} product={product} priority={i < 3} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-24 text-center">
+          <p className="text-[clamp(1.5rem,3.5vw,2.5rem)] uppercase font-bold tracking-tighter text-ink-100">NO PIECES FOUND</p>
+          {activeFilterCount > 0 && (
+            <a
+              href="/products"
+              className="mt-6 inline-block text-[0.8125rem] uppercase tracking-[0.18em] text-ink-300 underline underline-offset-4 hover:text-accent-lime"
+            >
+              RESET FILTER
+            </a>
           )}
         </div>
-      </div>
+      )}
     </div>
   )
 }
