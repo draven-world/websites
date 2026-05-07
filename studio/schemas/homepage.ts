@@ -16,12 +16,6 @@ export const homepage = defineType({
       type: 'image',
     }),
     defineField({
-      name: 'featuredCollection',
-      title: 'Featured Collection (Latest Drop)',
-      type: 'reference',
-      to: [{ type: 'collection' }],
-    }),
-    defineField({
       name: 'lookbookImages',
       title: 'Lookbook Images',
       type: 'array',
