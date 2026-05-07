@@ -39,11 +39,13 @@ export default function PaymentSection({
   address,
   shippingCost,
   onBack,
+  hideBack = false,
 }: {
   cart: Cart
   address: ShippingAddress
   shippingCost: ShippingCost
   onBack: () => void
+  hideBack?: boolean
 }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -168,7 +170,9 @@ export default function PaymentSection({
         },
         onClose: () => {
           // User closed popup — payment may or may not have been completed
-          setError('Payment window closed. Check your order status in Account > Orders, or try again from your orders page.')
+          setError(
+            'Payment window closed. Check your order status in Account > Orders, or try again from your orders page.',
+          )
         },
       })
     } catch (err: unknown) {
@@ -198,43 +202,63 @@ export default function PaymentSection({
 
   return (
     <div>
-      <h2 className="text-[13px] uppercase tracking-widest text-brand-950">
-        Payment
-      </h2>
-
       {/* Address & Shipping Summary */}
-      <div className="mt-6 border-t border-brand-200 pt-6">
-        <p className="text-[11px] uppercase tracking-widest text-brand-400">Shipping to</p>
-        <div className="mt-2 text-sm text-brand-500">
-          <p>{address.first_name} {address.last_name}</p>
+      <div className="border border-ink-700 p-5 mb-8">
+        <p className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-500 mb-3">
+          Shipping to
+        </p>
+        <div className="text-sm text-ink-300 space-y-0.5">
+          <p className="text-ink-100">
+            {address.first_name} {address.last_name}
+          </p>
           <p>{address.address_1}</p>
-          <p>{address.district}, {address.city}, {address.province} {address.postal_code}</p>
+          <p>
+            {address.district}, {address.city}, {address.province}{' '}
+            {address.postal_code}
+          </p>
           <p>{address.phone}</p>
         </div>
 
-        <div className="mt-4 text-sm text-brand-500">
-          <p>{shippingCost.description} · {formatRupiah(shippingCost.cost)}</p>
-          <p className="text-xs text-brand-400">Est. {shippingCost.etd}</p>
+        <div className="mt-4 pt-4 border-t border-ink-700 text-sm text-ink-300">
+          <p>{shippingCost.description}</p>
+          <p className="text-ink-500 text-xs mt-0.5">
+            {formatRupiah(shippingCost.cost)} · Est. {shippingCost.etd}
+          </p>
         </div>
       </div>
 
       {/* Payment Methods */}
-      <div className="mt-8 border-t border-brand-200 pt-6">
-        <p className="text-[11px] uppercase tracking-widest text-brand-400">Metode Pembayaran</p>
+      <div>
+        <p className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-500 mb-4">
+          Metode Pembayaran
+        </p>
 
-        <div className="mt-4 border border-brand-100 bg-brand-50/50 p-5">
+        <div className="border border-ink-700 bg-ink-900 p-5">
           <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center bg-brand-950 text-white">
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center bg-ink-100 text-ink-900">
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                />
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-brand-950">Pembayaran Aman via Midtrans</p>
-              <p className="mt-1.5 text-xs leading-relaxed text-brand-400">
-                Setelah klik &quot;Pay Now&quot;, kamu akan memilih metode pembayaran di jendela Midtrans yang aman:
+              <p className="text-sm font-medium text-ink-100">
+                Pembayaran Aman via Midtrans
               </p>
-              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-brand-500">
+              <p className="mt-1.5 text-xs leading-relaxed text-ink-500">
+                Setelah klik &quot;Pay Now&quot;, kamu akan memilih metode pembayaran di
+                jendela Midtrans yang aman:
+              </p>
+              <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-300">
                 <span>QRIS (recommended)</span>
                 <span>GoPay</span>
                 <span>ShopeePay</span>
@@ -250,27 +274,33 @@ export default function PaymentSection({
       </div>
 
       {/* Total */}
-      <div className="mt-8 border-t border-brand-950 pt-6">
+      <div className="mt-8 border-t border-ink-700 pt-6">
         <div className="flex items-baseline justify-between">
-          <span className="text-[11px] uppercase tracking-widest text-brand-400">Total</span>
-          <span className="text-xl font-medium text-brand-950">{formatRupiah(grandTotal)}</span>
+          <span className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-500">
+            Total
+          </span>
+          <span className="text-xl font-bold text-ink-100">
+            {formatRupiah(grandTotal)}
+          </span>
         </div>
       </div>
 
       {error && (
-        <div className="mt-4 border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+        <div className="mt-4 border border-red-800 bg-red-950/50 p-3 text-sm text-red-400">
           {error}
         </div>
       )}
 
-      <div className="mt-8 flex gap-3">
-        <button onClick={onBack} className="btn-secondary flex-1 py-4">
-          Back
-        </button>
+      <div className={`mt-8 flex gap-3`}>
+        {!hideBack && (
+          <button onClick={onBack} className="btn-ghost flex-1 py-4">
+            Back
+          </button>
+        )}
         <button
           onClick={handlePayment}
           disabled={loading}
-          className="btn-primary flex-1 py-4"
+          className={`btn-primary py-4 ${hideBack ? 'w-full' : 'flex-1'}`}
         >
           {loading ? 'Processing...' : 'Pay Now'}
         </button>

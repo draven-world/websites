@@ -7,6 +7,7 @@ import ShippingOptions from '@/components/checkout/ShippingOptions'
 import OrderSummary from '@/components/checkout/OrderSummary'
 import PaymentSection from '@/components/checkout/PaymentSection'
 import Link from 'next/link'
+import { formatRupiah } from '@/lib/utils'
 
 export type ShippingAddress = {
   first_name: string
@@ -32,6 +33,30 @@ export type ShippingCost = {
 
 type CheckoutStep = 'shipping' | 'delivery' | 'payment'
 
+function Section({
+  number,
+  title,
+  children,
+}: {
+  number: string
+  title: string
+  children: React.ReactNode
+}) {
+  return (
+    <section className="mt-16 pt-8 border-t border-ink-700">
+      <div className="flex items-baseline gap-4 mb-6">
+        <span className="text-[clamp(1.5rem,3.5vw,2.5rem)] font-bold text-ink-500 leading-none">
+          {number}
+        </span>
+        <span className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-300">
+          / {title}
+        </span>
+      </div>
+      {children}
+    </section>
+  )
+}
+
 export default function CheckoutPage() {
   const { cart, totalItems, loading } = useCart()
   const [step, setStep] = useState<CheckoutStep>('shipping')
@@ -41,18 +66,18 @@ export default function CheckoutPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
+        <div className="h-5 w-5 animate-spin border-2 border-ink-100 border-t-transparent" />
       </div>
     )
   }
 
   if (totalItems === 0) {
     return (
-      <div className="mx-auto max-w-container px-5 py-32 text-center lg:px-8">
-        <h1 className="text-2xl font-medium tracking-tightest text-brand-950">
+      <div className="mx-auto max-w-2xl px-8 pt-32 lg:pt-40 pb-32 text-center">
+        <h1 className="text-2xl font-bold tracking-tighter uppercase text-ink-100">
           Your bag is empty
         </h1>
-        <p className="mt-3 text-sm text-brand-400">
+        <p className="mt-3 text-sm text-ink-500">
           Add something before checking out.
         </p>
         <Link href="/products" className="btn-primary mt-8 inline-flex">
@@ -62,86 +87,103 @@ export default function CheckoutPage() {
     )
   }
 
-  const stepLabels = ['Address', 'Shipping', 'Payment'] as const
-  const steps = ['shipping', 'delivery', 'payment'] as const
-
   return (
-    <div className="mx-auto max-w-container px-5 py-10 lg:px-8 lg:py-16">
-      <h1 className="text-2xl font-medium tracking-tightest text-brand-950 md:text-3xl">
-        Checkout
+    <div className="max-w-2xl px-8 pt-32 lg:pt-40 pb-32 mx-auto">
+      <h1
+        className="font-bold uppercase tracking-tighter text-ink-100"
+        style={{ fontSize: 'clamp(2rem,5vw,4rem)' }}
+      >
+        CHECKOUT
       </h1>
 
-      {/* Progress */}
-      <div className="mt-8 flex items-center gap-4 text-[11px] uppercase tracking-widest">
-        {steps.map((s, i) => {
-          const isActive = s === step
-          const isDone =
-            (s === 'shipping' && (step === 'delivery' || step === 'payment')) ||
-            (s === 'delivery' && step === 'payment')
-
-          return (
-            <div key={s} className="flex items-center gap-4">
-              {i > 0 && <div className="h-px w-6 bg-brand-200" />}
-              <span
-                className={`flex h-6 w-6 items-center justify-center text-[10px] ${
-                  isDone
-                    ? 'bg-brand-950 text-white'
-                    : isActive
-                      ? 'border border-brand-950 text-brand-950'
-                      : 'border border-brand-200 text-brand-300'
-                }`}
-              >
-                {isDone ? '✓' : i + 1}
-              </span>
-              <span className={isDone || isActive ? 'text-brand-950' : 'text-brand-300'}>
-                {stepLabels[i]}
-              </span>
-            </div>
-          )
-        })}
+      {/* Collapsible order summary */}
+      <div className="mt-8">
+        <OrderSummary cart={cart} shippingCost={shippingCost} collapsible />
       </div>
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          {step === 'shipping' && (
-            <ShippingForm
-              onSubmit={(addr) => {
-                setAddress(addr)
-                setStep('delivery')
-              }}
-            />
-          )}
+      {/* 01 / CONTACT */}
+      <Section number="01" title="CONTACT">
+        {step === 'shipping' ? (
+          <ShippingForm
+            onSubmit={(addr) => {
+              setAddress(addr)
+              setStep('delivery')
+            }}
+          />
+        ) : address ? (
+          <div className="flex items-start justify-between">
+            <div className="text-sm text-ink-300 space-y-0.5">
+              <p className="text-ink-100">
+                {address.first_name} {address.last_name}
+              </p>
+              <p>{address.phone}</p>
+              <p>{address.address_1}</p>
+              <p>
+                {address.district}, {address.city}, {address.province}{' '}
+                {address.postal_code}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setStep('shipping')}
+              className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-500 hover:text-ink-100 transition-colors ml-8 flex-shrink-0"
+            >
+              Edit
+            </button>
+          </div>
+        ) : null}
+      </Section>
 
-          {step === 'delivery' && address && (
+      {/* 02 / SHIPPING METHOD — shown after address is confirmed */}
+      {(step === 'delivery' || step === 'payment') && address && (
+        <Section number="02" title="SHIPPING METHOD">
+          {step === 'delivery' ? (
             <ShippingOptions
               address={address}
               destinationId={address.district_id}
-              cartWeight={cart.items.reduce(
-                (sum, item) => sum + 200 * item.quantity,
-                0,
-              ) || 1000}
+              cartWeight={
+                cart.items.reduce((sum, item) => sum + 200 * item.quantity, 0) ||
+                1000
+              }
               onSelect={(cost) => {
                 setShippingCost(cost)
                 setStep('payment')
               }}
               onBack={() => setStep('shipping')}
+              hideBack
             />
-          )}
+          ) : shippingCost ? (
+            <div className="flex items-start justify-between">
+              <div className="text-sm text-ink-300">
+                <p className="text-ink-100">{shippingCost.description}</p>
+                <p className="mt-0.5 text-ink-500">
+                  {formatRupiah(shippingCost.cost)} · Est. {shippingCost.etd}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setStep('delivery')}
+                className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-500 hover:text-ink-100 transition-colors ml-8 flex-shrink-0"
+              >
+                Edit
+              </button>
+            </div>
+          ) : null}
+        </Section>
+      )}
 
-          {step === 'payment' && address && shippingCost && (
-            <PaymentSection
-              cart={cart}
-              address={address}
-              shippingCost={shippingCost}
-              onBack={() => setStep('delivery')}
-            />
-          )}
-        </div>
-
-        <div>
-          <OrderSummary cart={cart} shippingCost={shippingCost} />
-        </div>
-      </div>
+      {/* 03 / PAYMENT — shown after shipping method is selected */}
+      {step === 'payment' && address && shippingCost && (
+        <Section number="03" title="PAYMENT">
+          <PaymentSection
+            cart={cart}
+            address={address}
+            shippingCost={shippingCost}
+            onBack={() => setStep('delivery')}
+            hideBack
+          />
+        </Section>
+      )}
     </div>
   )
 }

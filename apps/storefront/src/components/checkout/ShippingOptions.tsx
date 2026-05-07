@@ -19,12 +19,14 @@ export default function ShippingOptions({
   cartWeight,
   onSelect,
   onBack,
+  hideBack = false,
 }: {
   address: ShippingAddress
   destinationId: string
   cartWeight: number
   onSelect: (cost: ShippingCost) => void
   onBack: () => void
+  hideBack?: boolean
 }) {
   const [loading, setLoading] = useState(false)
   const [options, setOptions] = useState<CostOption[]>([])
@@ -53,7 +55,9 @@ export default function ShippingOptions({
       const data = await res.json()
 
       if (data.costs && data.costs.length > 0) {
-        const sorted = [...data.costs].sort((a: CostOption, b: CostOption) => a.cost - b.cost)
+        const sorted = [...data.costs].sort(
+          (a: CostOption, b: CostOption) => a.cost - b.cost,
+        )
         setOptions(sorted)
       } else {
         setError(data.error || 'No shipping options available')
@@ -71,61 +75,67 @@ export default function ShippingOptions({
 
   return (
     <div>
-      <h2 className="text-[13px] uppercase tracking-widest text-brand-950">
-        Select Shipping
-      </h2>
-      <p className="mt-2 text-sm text-brand-400">
+      <p className="text-sm text-ink-500 mb-6">
         Deliver to: {address.district}, {address.city}, {address.province}
       </p>
 
       {loading ? (
-        <div className="flex items-center justify-center py-16">
-          <div className="h-5 w-5 animate-spin border-2 border-brand-950 border-t-transparent" />
-          <span className="ml-3 text-sm text-brand-400">Checking rates...</span>
+        <div className="flex items-center gap-3 py-12">
+          <div className="h-5 w-5 animate-spin border-2 border-ink-100 border-t-transparent" />
+          <span className="text-sm text-ink-500">Checking rates...</span>
         </div>
       ) : options.length > 0 ? (
-        <div className="mt-6 space-y-2">
+        <div>
           {options.map((opt) => {
             const key = `${opt.code}-${opt.service}`
-            const isSelected = selected && `${selected.courier}-${selected.service}` === key
+            const isSelected =
+              selected && `${selected.courier}-${selected.service}` === key
             return (
               <button
                 key={key}
-                onClick={() => setSelected({
-                  courier: opt.code,
-                  service: opt.service,
-                  description: `${opt.name} — ${opt.description}`,
-                  cost: opt.cost,
-                  etd: opt.etd,
-                })}
-                className={`flex w-full items-center justify-between p-4 text-left transition-colors ${
+                onClick={() =>
+                  setSelected({
+                    courier: opt.code,
+                    service: opt.service,
+                    description: `${opt.name} — ${opt.description}`,
+                    cost: opt.cost,
+                    etd: opt.etd,
+                  })
+                }
+                className={`flex w-full items-center justify-between py-4 text-left cursor-pointer transition-colors border-b ${
                   isSelected
-                    ? 'border border-brand-950 bg-brand-50'
-                    : 'border border-brand-100 hover:border-brand-300'
+                    ? 'border-accent-lime'
+                    : 'border-ink-700 hover:border-ink-300'
                 }`}
               >
                 <div>
-                  <p className="text-sm text-brand-950">
+                  <p
+                    className={`text-sm ${isSelected ? 'text-ink-100' : 'text-ink-300'}`}
+                  >
                     {opt.name} — {opt.service}
                   </p>
-                  <p className="mt-0.5 text-xs text-brand-400">
+                  <p className="mt-0.5 text-xs text-ink-500">
                     {opt.description} · Est. {opt.etd}
                   </p>
                 </div>
-                <p className="text-sm text-brand-950">{formatRupiah(opt.cost)}</p>
+                <p
+                  className={`text-sm ml-4 flex-shrink-0 ${isSelected ? 'text-accent-lime' : 'text-ink-300'}`}
+                >
+                  {formatRupiah(opt.cost)}
+                </p>
               </button>
             )
           })}
         </div>
       ) : (
-        <div className="mt-6 py-12 text-center">
-          <p className="text-sm text-brand-400">
+        <div className="py-12">
+          <p className="text-sm text-ink-500">
             {error || 'No shipping options available. Try a different address.'}
           </p>
           <button
             type="button"
             onClick={loadShippingCosts}
-            className="mt-4 text-[11px] uppercase tracking-widest text-brand-950 underline underline-offset-4 transition-opacity hover:opacity-60"
+            className="mt-4 text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 underline underline-offset-4 transition-opacity hover:opacity-60"
           >
             Retry
           </button>
@@ -133,13 +143,15 @@ export default function ShippingOptions({
       )}
 
       <div className="mt-8 flex gap-3">
-        <button onClick={onBack} className="btn-secondary flex-1 py-4">
-          Back
-        </button>
+        {!hideBack && (
+          <button onClick={onBack} className="btn-ghost flex-1 py-4">
+            Back
+          </button>
+        )}
         <button
           onClick={handleSubmit}
           disabled={!selected}
-          className="btn-primary flex-1 py-4"
+          className={`btn-primary py-4 ${hideBack ? 'w-full' : 'flex-1'}`}
         >
           Continue to Payment
         </button>

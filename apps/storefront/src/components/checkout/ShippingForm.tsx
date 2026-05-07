@@ -161,42 +161,43 @@ export default function ShippingForm({
     }
   }
 
+  const selectClass =
+    'bg-ink-900 border border-ink-700 text-ink-100 px-3 py-3 w-full focus:outline-none focus:border-accent-lime disabled:opacity-30'
+
   return (
     <form onSubmit={handleSubmit}>
-      <h2 className="text-[13px] uppercase tracking-widest text-brand-950">
-        Shipping Address
-      </h2>
-
-      <div className="mt-6 grid gap-5 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             First Name *
           </label>
           <input
             type="text"
             value={form.first_name}
             onChange={(e) => setForm((f) => ({ ...f, first_name: e.target.value }))}
-            className="input-field"
+            className="underline-input w-full"
             placeholder="First name"
           />
-          {errors.first_name && <p className="mt-1 text-xs text-red-500">{errors.first_name}</p>}
+          {errors.first_name && (
+            <p className="mt-1 text-xs text-red-500">{errors.first_name}</p>
+          )}
         </div>
 
         <div>
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             Last Name
           </label>
           <input
             type="text"
             value={form.last_name}
             onChange={(e) => setForm((f) => ({ ...f, last_name: e.target.value }))}
-            className="input-field"
+            className="underline-input w-full"
             placeholder="Last name"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             Phone (WhatsApp) *
           </label>
           <input
@@ -206,7 +207,14 @@ export default function ShippingForm({
               setForm((f) => ({ ...f, phone: e.target.value }))
               if (errors.phone) {
                 const err = validatePhone(e.target.value)
-                setErrors((prev) => err ? { ...prev, phone: err } : (() => { const { phone, ...rest } = prev; return rest })())
+                setErrors((prev) =>
+                  err
+                    ? { ...prev, phone: err }
+                    : (() => {
+                        const { phone, ...rest } = prev
+                        return rest
+                      })(),
+                )
               }
             }}
             onBlur={() => {
@@ -215,35 +223,39 @@ export default function ShippingForm({
                 if (err) setErrors((prev) => ({ ...prev, phone: err }))
               }
             }}
-            className={`input-field ${errors.phone ? 'border-red-500' : form.phone && !validatePhone(form.phone) ? 'border-green-500' : ''}`}
+            className="underline-input w-full"
             placeholder="08xxxxxxxxxx"
           />
-          <p className="mt-1 text-[10px] text-brand-300">Format: 08xxxxxxxxxx</p>
-          {errors.phone && <p className="mt-0.5 text-xs text-red-500">{errors.phone}</p>}
+          <p className="mt-1 text-[0.65rem] text-ink-500">Format: 08xxxxxxxxxx</p>
+          {errors.phone && (
+            <p className="mt-0.5 text-xs text-red-500">{errors.phone}</p>
+          )}
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             Full Address *
           </label>
           <textarea
             value={form.address_1}
             onChange={(e) => setForm((f) => ({ ...f, address_1: e.target.value }))}
             rows={3}
-            className="input-field"
+            className="underline-input w-full resize-none"
             placeholder="Street, house number, RT/RW"
           />
-          {errors.address_1 && <p className="mt-1 text-xs text-red-500">{errors.address_1}</p>}
+          {errors.address_1 && (
+            <p className="mt-1 text-xs text-red-500">{errors.address_1}</p>
+          )}
         </div>
 
         <div>
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             Province *
           </label>
           <select
             value={form.province_id}
             onChange={(e) => handleProvinceChange(e.target.value)}
-            className="input-field"
+            className={selectClass}
           >
             <option value="">Select Province</option>
             {provinces.map((p) => (
@@ -252,18 +264,20 @@ export default function ShippingForm({
               </option>
             ))}
           </select>
-          {errors.province && <p className="mt-1 text-xs text-red-500">{errors.province}</p>}
+          {errors.province && (
+            <p className="mt-1 text-xs text-red-500">{errors.province}</p>
+          )}
         </div>
 
         <div>
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             City *
           </label>
           <select
             value={form.city_id}
             onChange={(e) => handleCityChange(e.target.value)}
             disabled={!form.province_id || loadingCities}
-            className="input-field disabled:opacity-30"
+            className={selectClass}
           >
             <option value="">{loadingCities ? 'Loading...' : 'Select City'}</option>
             {cities.map((c) => (
@@ -276,14 +290,14 @@ export default function ShippingForm({
         </div>
 
         <div>
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             District *
           </label>
           <select
             value={form.district_id}
             onChange={(e) => handleDistrictChange(e.target.value)}
             disabled={!form.city_id || loadingDistricts}
-            className="input-field disabled:opacity-30"
+            className={selectClass}
           >
             <option value="">{loadingDistricts ? 'Loading...' : 'Select District'}</option>
             {districts.map((d) => (
@@ -292,18 +306,20 @@ export default function ShippingForm({
               </option>
             ))}
           </select>
-          {errors.district && <p className="mt-1 text-xs text-red-500">{errors.district}</p>}
+          {errors.district && (
+            <p className="mt-1 text-xs text-red-500">{errors.district}</p>
+          )}
         </div>
 
         <div>
-          <label className="mb-2 block text-[11px] uppercase tracking-widest text-brand-400">
+          <label className="block text-[0.75rem] uppercase tracking-[0.15em] text-ink-300 mb-2">
             Postal Code
           </label>
           <input
             type="text"
             value={form.postal_code}
             onChange={(e) => setForm((f) => ({ ...f, postal_code: e.target.value }))}
-            className="input-field"
+            className="underline-input w-full"
             placeholder="Postal code"
           />
         </div>
@@ -315,44 +331,61 @@ export default function ShippingForm({
           <button
             type="button"
             onClick={handleEstimate}
-            className="text-[11px] uppercase tracking-widest text-brand-400 underline underline-offset-4 transition-colors hover:text-brand-950"
+            className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-500 underline underline-offset-4 transition-colors hover:text-ink-100"
           >
             Estimasi Ongkir
           </button>
 
           {showEstimate && (
-            <div className="mt-4 border border-brand-100 p-4">
+            <div className="mt-4 border border-ink-700 bg-ink-900 p-4">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] uppercase tracking-widest text-brand-400">
+                <p className="text-[0.75rem] uppercase tracking-[0.15em] text-ink-300">
                   Estimasi ke {form.district}, {form.city}
                 </p>
                 <button
                   type="button"
                   onClick={() => setShowEstimate(false)}
-                  className="text-brand-400 hover:text-brand-950"
+                  className="text-ink-500 hover:text-ink-100"
                   aria-label="Close estimate"
                 >
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.5}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
               {estimateLoading ? (
                 <div className="flex items-center gap-2 py-4">
-                  <div className="h-4 w-4 animate-spin border-2 border-brand-950 border-t-transparent" />
-                  <span className="text-xs text-brand-400">Menghitung...</span>
+                  <div className="h-4 w-4 animate-spin border-2 border-ink-100 border-t-transparent" />
+                  <span className="text-xs text-ink-500">Menghitung...</span>
                 </div>
               ) : estimates.length > 0 ? (
                 <div className="mt-3 space-y-2">
                   {estimates.map((est, i) => (
                     <div key={i} className="flex items-center justify-between text-sm">
-                      <span className="text-brand-600">{est.name} {est.service} <span className="text-xs text-brand-300">({est.etd})</span></span>
-                      <span className="font-medium text-brand-950">{formatRupiah(est.cost)}</span>
+                      <span className="text-ink-300">
+                        {est.name} {est.service}{' '}
+                        <span className="text-xs text-ink-500">({est.etd})</span>
+                      </span>
+                      <span className="font-medium text-ink-100">
+                        {formatRupiah(est.cost)}
+                      </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="mt-3 text-xs text-brand-400">Tidak dapat menghitung ongkir.</p>
+                <p className="mt-3 text-xs text-ink-500">
+                  Tidak dapat menghitung ongkir.
+                </p>
               )}
             </div>
           )}
